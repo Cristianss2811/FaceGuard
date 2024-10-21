@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="display-3">Áreas</h1>
+    <table class="table table-striped mt-5">
+        <thead style="background-color: #066699 !important; color: white !important;">
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Activo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for area in areas %}
+            <tr>
+                <td>{{ area.nombre }}</td>
+                <td>{{ area.descripcion }}</td>
+                <td>{{ area.activo }}</td>
+                <td>
+                    <a href="{% url 'areas_editar' area.id %}" class="btn btn-sm btn-success"><i class="bi bi-pencil-fill"></i></a>
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ area.id }}">
+                        <i class="bi bi-trash-fill"></i>
+                    </button>
+                </td>
+            </tr>
+            {% include 'modal_eliminar.html' %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+
+
