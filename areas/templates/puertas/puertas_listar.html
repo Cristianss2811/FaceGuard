@@ -8,36 +8,38 @@
 <link rel="stylesheet" href="{% static 'css/data_table.css' %}">
 
 <div class="container mt-5">
-    <h1 class="display-3">Áreas</h1>
+    <h1 class="display-3">Puertas</h1>
     
     <table id="areasTable" class="table table-striped mt-5">
         <thead style="background-color: #066699 !important; color: white !important;">
-            <a href="{% url 'areas_crear' %}" class="btn" style="background-color: #066699; color: white;">
+            <a href="{% url 'puertas_crear' %}" class="btn" style="background-color: #066699; color: white;">
                 <i class="bi bi-plus-lg"></i> Añadir
             </a>
             <tr>
                 <th>Nombre</th>
                 <th>Descripción</th>
+                <th>Area</th>
                 <th>Activo</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-            {% for area in areas %}
+            {% for puerta in puertas %}
             <tr>
-                <td>{{ area.nombre }}</td>
-                <td>{{ area.descripcion }}</td>
-                <td>{{ area.activo }}</td>
+                <td>{{ puerta.nombre }}</td>
+                <td>{{ puerta.descripcion }}</td>
+                <td>{{ puerta.area }}</td>
+                <td>{{ puerta.activo }}</td>
                 <td>
-                    <a href="{% url 'areas_editar' area.id %}" class="btn btn-sm btn-success">
+                    <a href="{% url 'puertas_editar' puerta.id %}" class="btn btn-sm btn-success">
                         <i class="bi bi-pencil-fill"></i>
                     </a>
-                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ area.id }}">
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ puerta.id }}">
                         <i class="bi bi-trash-fill"></i>
                     </button>
                 </td>
             </tr>
-            {% include 'modal_eliminar.html' with object_id=area.id object_name=area.nombre delete_url='areas_eliminar'  %}
+            {% include 'modal_eliminar.html' with object_id=puerta.id object_name=puerta.nombre delete_url='puertas_eliminar'  %}
             {% endfor %}
         </tbody>
     </table>

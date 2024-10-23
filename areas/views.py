@@ -4,6 +4,8 @@ from .forms import AreaForm, PuertaForm
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
+
+#Views Areas ------------------------------------------------------------------------
 @login_required
 def areas_listar(request):
     areas = Area.objects.all()
@@ -40,7 +42,43 @@ def areas_eliminar(request, id):
         return redirect(areas_listar)
     return render(request, 'areas/areas_eliminar.html', {'area': area})
 
+
+#-------------------------------------------------------------------------------------------------
+
+
+# Views Puertas -----------------------------------------------------------------------------------
 @login_required
 def puertas_listar(request):
     puertas = Puerta.objects.all()
-    return render(request, 'areas/puertas_listar.html', {'puertas': puertas})
+    return render(request, 'puertas/puertas_listar.html', {'puertas': puertas})
+
+@login_required
+def puertas_crear(request):
+    if request.method == 'POST':
+        form = PuertaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(puertas_listar)
+    else:
+        form = PuertaForm()
+    return render(request, 'puertas/puertas_crear.html', {'form': form})
+
+@login_required
+def puertas_editar(request, id):
+    puerta = get_object_or_404(Puerta, id=id)
+    if request.method == 'POST':
+        form = PuertaForm(request.POST, instance=puerta)
+        if form.is_valid():
+            form.save()
+            return redirect('puertas_listar')
+    else:
+        form = PuertaForm(instance=puerta)
+    return render(request, 'puertas/puertas_editar.html', {'form': form, 'puerta': puerta})
+
+@login_required
+def puertas_eliminar(request, id):
+    puerta = get_object_or_404(Puerta, pk=id)
+    if request.method == 'POST':
+        puerta.delete()
+        return redirect(puertas_listar)
+    return render(request, 'puertas/puertas_eliminar.html', {'puerta': puerta})
