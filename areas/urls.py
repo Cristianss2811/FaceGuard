@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import areas_listar, areas_crear, areas_editar, areas_eliminar,puertas_listar,puertas_crear
+from .views import areas_listar, areas_crear, areas_editar, areas_eliminar
 
 urlpatterns = [
     path('', areas_listar, name='areas_listar'),
