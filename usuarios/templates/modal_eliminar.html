@@ -1,0 +1,21 @@
+
+<div class="modal fade" id="deleteModal{{ object_id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ object_id }}" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="deleteModalLabel{{ object_id }}">Confirmar eliminación</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              ¿Estás seguro de que deseas eliminar "{{ object_name }}"?
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <form action="{% url delete_url object_id %}" method="POST" style="display:inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger">Eliminar</button>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>

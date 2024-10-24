@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<main class="container">
+  <div class="row">
+    <div class="col-md-4 offset-md-4 mt-5">
+        <form action="{% url 'roles_editar' rol.id %}" method="POST" class="card card-body">
+          <h1 class="display-3">Editar Rol</h1>
+          {% if form.non_field_errors %}
+              <div class="alert alert-danger">
+                  {{ form.non_field_errors }}
+              </div>
+          {% endif %}
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button class="btn" style="background-color: #066699; color: white;">Guardar</button>
+        </form>
+    </div>
+  </div>
+</main>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css">
+<link rel="stylesheet" href="{% static 'css/data_table.css' %}">
+
+<div class="container mt-5">
+    <h1 class="display-3">Roles</h1>
+    
+    <table id="rolesTable" class="table table-striped mt-5">
+        <thead style="background-color: #066699 !important; color: white !important;">
+            <a href="{% url 'roles_crear' %}" class="btn" style="background-color: #066699; color: white;">
+                <i class="bi bi-plus-lg"></i> Añadir
+            </a>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Activo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rol in roles %}
+            <tr>
+                <td>{{ rol.nombre }}</td>
+                <td>{{ rol.descripcion }}</td>
+                <td>{{ rol.activo|yesno:"Sí,No" }}</td>
+                <td>
+                    <a href="{% url 'roles_editar' rol.id %}" class="btn btn-sm btn-success">
+                        <i class="bi bi-pencil-fill"></i>
+                    </a>
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ rol.id }}">
+                        <i class="bi bi-trash-fill"></i>
+                    </button>
+                </td>
+            </tr>
+            {% include 'modal_eliminar.html' with object_id=rol.id object_name=rol.nombre delete_url='roles_eliminar' %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
+<script src="{% static 'js/data_table.js' %}"></script>
+
+<!-- DataTables Initialization -->
+<script>
+    $(document).ready(function() {
+        $('#rolesTable').DataTable({
+            "language": {
+            }
+        });
+    });
+</script>
+{% endblock %}
