@@ -1,0 +1,32 @@
+body {
+    display: flex;
+}
+.sidebar {
+    background-color: #02416d;
+    width: 250px;
+    min-height: 100vh;
+    color: #fff;
+    padding-top: 20px;
+}
+.sidebar a {
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 15px;
+    display: block;
+}
+.sidebar a:hover {
+    background-color: #0a5483;
+}
+.sidebar .active {
+    background-color: #aedd2b;
+}
+.sidebar hr {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+.content {
+    flex-grow: 1;
+    padding: 20px;
+}
+.sidebar-icon {
+    margin-right: 10px;
+}
