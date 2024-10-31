@@ -2,6 +2,7 @@
 from datetime import datetime
 
 import django.db.models.deletion
+from django.conf import settings
 from django.db import migrations, models
 
 class Migration(migrations.Migration):
@@ -18,6 +19,22 @@ class Migration(migrations.Migration):
                 ('tipo', models.CharField(max_length=40)),
                 ('hora', models.TimeField(default = datetime.now().strftime("%H:%M:%S"))),
                 ('fecha', models.DateField(default= datetime.now().strftime("%Y-%m-%d"))),
+            ],
+        ),
+        migrations.CreateModel(
+            name='UsuarioMovimiento',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('usuario', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('movimiento', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='atencion.movimiento')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='PuertaMovimiento',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('puerta', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='areas.puerta')),
+                ('movimiento', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='atencion.movimiento')),
             ],
         ),
     ]
