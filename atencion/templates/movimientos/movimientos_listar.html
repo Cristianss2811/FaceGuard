@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css">
+
+<link rel="stylesheet" href="{% static 'css/data_table.css' %}">
+
+<div class="container mt-5">
+    <h1 class="display-3">Movimientos</h1>
+    
+    <table id="movimientosTable" class="table table-striped mt-5">
+        <thead style="background-color: #066699 !important; color: white !important;">
+            <tr>
+                <th>Tipo</th>
+                <th>Hora</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for movimiento in movimientos %}
+            <tr>
+                <td>{{ movimiento.tipo }}</td>
+                <td>{{ movimiento.hora }}</td>
+                <td>{{ movimiento.fecha }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
+
+<script src="{% static 'js/data_table.js' %}"></script>
+
+<!-- DataTables Initialization -->
+<script>
+    $(document).ready(function() {
+        $('#movimientosTable').DataTable({
+            // Opciones adicionales (ej. idioma, paginación, longitud de página)
+            "language": {
+                
+            }
+        });
+    });
+</script>
+{% endblock %}
+
+
+
