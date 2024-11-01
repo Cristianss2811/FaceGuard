@@ -7,6 +7,7 @@ from .forms import TaskForm
 from .models import Task
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+from usuarios.models import Profile
 
 # Create your views here.
 
@@ -28,9 +29,17 @@ def signup(request):
                     password=request.POST["password1"],
                 )
                 user.save()
+
+                # Obtener imagen_id del formulario
+                imagen_id = request.POST.get("imagen_id")
+                # Crear el perfil asociado al usuario
+                profile = Profile.objects.create( user=user, imagen_id=imagen_id, )
+                profile.save()
+
                 login(
                     request, user
                 )  # Creo la cookie para que el navegador sepa que hay un usuario logeado
+
                 return redirect(tasks)  # Me envia a tasks.html
             except IntegrityError:
                 return render(  # Aqui retornamos a la misma vista y el mismo formulario
