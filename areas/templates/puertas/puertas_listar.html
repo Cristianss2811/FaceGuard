@@ -28,7 +28,11 @@
             <tr>
                 <td>{{ puerta.nombre }}</td>
                 <td>{{ puerta.descripcion }}</td>
-                <td>{{ puerta.area }}</td>
+                <td>
+                    {% for area in puerta.areas.all %}
+                        {{ area.nombre }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
                 <td>{{ puerta.activo }}</td>
                 <td>
                     <a href="{% url 'puertas_editar' puerta.id %}" class="btn btn-sm btn-success">

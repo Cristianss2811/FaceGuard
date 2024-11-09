@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Area, Puerta
-from .forms import AreaForm, PuertaForm
+from .models import Area, Puerta, Zona
+from .forms import AreaForm, PuertaForm, ZonaForm
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
@@ -82,3 +82,46 @@ def puertas_eliminar(request, id):
         puerta.delete()
         return redirect(puertas_listar)
     return render(request, 'puertas/puertas_eliminar.html', {'puerta': puerta})
+
+#-------------------------------------------------------------------------------------------------
+
+
+#Views Zonas ------------------------------------------------------------------------
+@login_required
+def zonas_listar(request):
+    zonas = Zona.objects.all()
+    return render(request, 'zonas/zonas_listar.html', {'zonas': zonas})
+
+@login_required
+def zonas_crear(request):
+    if request.method == 'POST':
+        form = ZonaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(zonas_listar)
+    else:
+        form = ZonaForm()
+    return render(request, 'zonas/zonas_crear.html', {'form': form})
+
+@login_required
+def zonas_editar(request, id):
+    zona = get_object_or_404(Zona, id=id)
+    if request.method == 'POST':
+        form = ZonaForm(request.POST, instance=zona)
+        if form.is_valid():
+            form.save()
+            return redirect('zonas_listar')
+    else:
+        form = ZonaForm(instance=zona)
+    return render(request, 'zonas/zonas_editar.html', {'form': form, 'zona': zona})
+
+@login_required
+def zonas_eliminar(request, id):
+    zona = get_object_or_404(Zona, pk=id)
+    if request.method == 'POST':
+        zona.delete()
+        return redirect(zonas_listar)
+    return render(request, 'zonas/zonas_eliminar.html', {'zona': zona})
+
+
+#-------------------------------------------------------------------------------------------------

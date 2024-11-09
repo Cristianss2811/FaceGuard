@@ -8,42 +8,36 @@
 <link rel="stylesheet" href="{% static 'css/data_table.css' %}">
 
 <div class="container mt-5">
-    <h1 class="display-3">Áreas</h1>
+    <h1 class="display-3">Zonas</h1>
     
-    <table id="areasTable" class="table table-striped mt-5">
+    <table id="zonasTable" class="table table-striped mt-5">
         <thead style="background-color: #066699 !important; color: white !important;">
-            <a href="{% url 'areas_crear' %}" class="btn" style="background-color: #066699; color: white;">
+            <a href="{% url 'zonas_crear' %}" class="btn" style="background-color: #066699; color: white;">
                 <i class="bi bi-plus-lg"></i> Añadir
             </a>
             <tr>
                 <th>Nombre</th>
                 <th>Descripción</th>
-                <th>Zonas</th>
                 <th>Activo</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-            {% for area in areas %}
+            {% for zona in zonas %}
             <tr>
-                <td>{{ area.nombre }}</td>
-                <td>{{ area.descripcion }}</td>
+                <td>{{ zona.nombre }}</td>
+                <td>{{ zona.descripcion }}</td>
+                <td>{{ zona.activo }}</td>
                 <td>
-                    {% for zona in area.zonas.all %}
-                        {{ zona.nombre }}{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
-                </td>
-                <td>{{ area.activo }}</td>
-                <td>
-                    <a href="{% url 'areas_editar' area.id %}" class="btn btn-sm btn-success">
+                    <a href="{% url 'zonas_editar' zona.id %}" class="btn btn-sm btn-success">
                         <i class="bi bi-pencil-fill"></i>
                     </a>
-                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ area.id }}">
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ zona.id }}">
                         <i class="bi bi-trash-fill"></i>
                     </button>
                 </td>
             </tr>
-            {% include 'modal_eliminar.html' with object_id=area.id object_name=area.nombre delete_url='areas_eliminar'  %}
+            {% include 'modal_eliminar.html' with object_id=zona.id object_name=zona.nombre delete_url='zonas_eliminar'  %}
             {% endfor %}
         </tbody>
     </table>
@@ -59,7 +53,7 @@
 <!-- DataTables Initialization -->
 <script>
     $(document).ready(function() {
-        $('#areasTable').DataTable({
+        $('#zonasTable').DataTable({
             // Opciones adicionales (ej. idioma, paginación, longitud de página)
             "language": {
                 

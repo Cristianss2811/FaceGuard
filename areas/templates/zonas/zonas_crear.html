@@ -3,9 +3,11 @@
 {% block content %}
 <main class="container">
   <div class="row">
-    <div class="col-md-4 offset-md-4 mt-5">
-        <form action="{% url 'puertas_editar' puerta.id %}" method="POST" class="card card-body">
-          <h1 class="display-3">Editar Puerta</h1>
+    <div class="col-md-4 offset-md-4 mt5">
+      
+        <form action="/zonas/crear/" method="POST" class="card card-body">
+          <h1 class="display-3">Crear Zona</h1>
+            {{error}}
           {% csrf_token %}
           {{ form.as_p }}
           <button class="btn" style="background-color: #066699; color: white;">Guardar</button>

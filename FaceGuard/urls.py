@@ -32,6 +32,7 @@ urlpatterns = [
     path("logout/", views.signout, name="logout"),
     path("signin/", views.signin, name="signin"),
     path("areas/", include("areas.urls")),
+    path("zonas/", include("areas.zonas_urls")),
     path("puertas/", include("areas.puertas_urls")),
     path('roles/', include('usuarios.roles_urls')),
     path('movimientos/', include('atencion.urls'))

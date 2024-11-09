@@ -4,8 +4,8 @@
 <main class="container">
   <div class="row">
     <div class="col-md-4 offset-md-4 mt-5">
-        <form action="{% url 'puertas_editar' puerta.id %}" method="POST" class="card card-body">
-          <h1 class="display-3">Editar Puerta</h1>
+        <form action="{% url 'zonas_editar' zona.id %}" method="POST" class="card card-body">
+          <h1 class="display-3">Editar Zona</h1>
           {% csrf_token %}
           {{ form.as_p }}
           <button class="btn" style="background-color: #066699; color: white;">Guardar</button>
