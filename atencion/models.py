@@ -18,5 +18,5 @@ class UsuarioMovimiento(models.Model):
     movimiento = models.ForeignKey(Movimiento, on_delete=models.CASCADE)
 
 class PuertaMovimiento(models.Model):
-    puerta = models.ForeignKey(UserModel, on_delete=models.CASCADE)
-    movimiento = models.ForeignKey(Puerta, on_delete=models.CASCADE)
+    puerta = models.ForeignKey(Puerta, on_delete=models.CASCADE)
+    movimiento = models.ForeignKey(Movimiento, on_delete=models.CASCADE)
