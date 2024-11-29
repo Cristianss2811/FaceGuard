@@ -37,5 +37,5 @@ urlpatterns = [
     path('roles/', include('usuarios.roles_urls')),
     path('movimientos/', include('atencion.urls')),
     path('notificaciones/', include('notificaciones.urls')),
-
+    path('usuarios/', include('usuarios.usuarios_urls')),
 ]

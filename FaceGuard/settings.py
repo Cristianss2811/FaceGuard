@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'tasks',
     'areas',
     'usuarios',
-    'atencion',
     'notificaciones',
+    'atencion'
 ]
 
 MIDDLEWARE = [
