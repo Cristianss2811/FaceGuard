@@ -11,19 +11,80 @@
       </div>
         {{error}} <!--Aquí traigo el error desde views para mostrarlo en el frontend-->
         {% csrf_token %}
+
         <div class="mb-3">
           <label for="username">Username:</label>
           <input type="text" name="username" id="username" class="form-control" placeholder="correo@gmail.com">
         </div>
+
         <div class="mb-3">
           <label for="password">Password:</label>
           <input type="password" name="password" id="password" class="form-control" placeholder="Write your password">
         </div>
-       
+
+        <div class="mb-3">
+          <div>
+            <video id="video" width="640" height="480" style="display:none;" autoplay></video>
+            <button type="button" class="btn btn-secondary mt-2" onclick="startCamera()">Iniciar Cámara</button>
+            <p id="status"></p>
+          </div>
+          <canvas id="canvas" style="display:none;"></canvas>
+          <input type="hidden" name="photo" id="photo">
+            <!-- Código añadido para mostrar la imagen capturada -->
+          <img id="capturedImage" width="320" height="240" style="display:none; margin-top: 10px;">
+        </div>
 
         <button class="btn" style="background-color: #066699; color: white;">Sign In</button>
 </form>
+          </section>
       </div>
-    </section>
 </main>
+<script>
+function startCamera() {
+    navigator.mediaDevices.getUserMedia({ video: true })
+    .then(function(stream) {
+        var video = document.getElementById('video');
+        video.srcObject = stream;
+        video.style.display = "block";
+        video.play();
+        document.getElementById('status').innerText = "Cámara iniciada, capturando en 5 segundos...";
+        setTimeout(function() {
+            capturePhoto(stream);  // Pasamos el stream para detenerlo después
+        }, 5000);
+    })
+    .catch(function(err) {
+        console.error("Error accessing the camera: " + err);
+        document.getElementById('status').innerText = "Error accediendo a la cámara: " + err;
+    });
+}
+
+function capturePhoto(stream) {
+    var video = document.getElementById('video');
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
+
+    // Establece las dimensiones del canvas al tamaño del video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Dibuja el video en el canvas
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    var photo = canvas.toDataURL('image/png');
+    document.getElementById('photo').value = photo;
+    document.getElementById('status').innerText = "Foto capturada";
+
+    // Mostrar la imagen capturada en el elemento <img>
+    var capturedImage = document.getElementById('capturedImage');
+    capturedImage.src = photo;
+    capturedImage.style.display = "block";
+
+    // Oculta el elemento de video y detiene el flujo de la cámara
+    video.style.display = "none";
+    stream.getTracks().forEach(track => track.stop()); // Detener el flujo de la cámara
+}
+
+window.onload = function() {
+    console.log("Página cargada");
+}
+</script>
 {% endblock %}

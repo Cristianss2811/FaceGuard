@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css">
+<link rel="stylesheet" href="{% static 'css/data_table.css' %}">
+
+<div class="container mt-5">
+    <h1 class="display-3">Usuarios</h1>
+    
+    <table id="usuariosTable" class="table table-striped mt-5">
+        <thead style="background-color: #066699 !important; color: white !important;">
+            <!--<a href="{% url 'roles_crear' %}" class="btn" style="background-color: #066699; color: white;">
+                <i class="bi bi-plus-lg"></i> Añadir
+            </a>-->
+            <tr>
+                <th>Nombre completo</th>
+                <th>Dirección</th>
+                <th>Ciudad</th>
+                <th>Estado</th>
+                <th>Teléfono</th>
+                <th>Roles</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+                <td>{{ usuario.nombre|add:" " }}{{ usuario.apellido_p|add:" " }}{{ usuario.apellido_m }}</td>
+                <td>{{ usuario.direccion }}</td>
+                <td>{{ usuario.ciudad }}</td>
+                <td>{{ usuario.estado }}</td>
+                <td>{{ usuario.telefono }}</td>
+
+                <td>
+                    {% if usuario.roles %}
+                        {% for perfil_rol in usuario.roles %}
+                            <span class="badge bg-primary">{{ perfil_rol.role.nombre }}</span>
+                        {% endfor %}
+                    {% else %}
+                        <span>No tiene roles</span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    <a href="{% url 'usuarios_editar' usuario.user_id %}" class="btn btn-sm btn-success">
+                        <i class="bi bi-pencil-fill"></i>
+                    </a>
+                    <!--<button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ usuario.user_id }}">
+                        <i class="bi bi-trash-fill"></i>
+                    </button>-->
+                    <a href="{% url 'usuarios_asignar_roles' usuario.user_id %}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-person-plus-fill"></i>
+                    </a>
+                    <a href="{% url 'eliminar_roles_usuario' usuario.user_id %}" class="btn btn-sm btn-danger">
+                     <i class="bi bi-trash-fill"></i>
+                    </a>
+                </td>
+            </tr>
+            {% include 'modal_eliminar.html' with object_id=usuario.user_id object_name=usuario.nombre delete_url='usuarios_eliminar' %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
+<script src="{% static 'js/data_table.js' %}"></script>
+
+<!-- DataTables Initialization -->
+<script>
+    $(document).ready(function() {
+        $('#usuariosTable').DataTable({
+            "language": {
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,8 +1,10 @@
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from django.db import IntegrityError
+from usuarios.utils.registro_facial import registro_facial, consultar_imagen_usuario, login_captura_facial
 from .forms import TaskForm
 from .models import Task
 from django.utils import timezone
@@ -17,12 +19,35 @@ def home(request):
 
 
 def signup(request):
-
     if request.method == "GET":
         return render(request, "signup.html", {"form": UserCreationForm})
     else:
         if request.POST["password1"] == request.POST["password2"]:
             try:
+                photo_data = request.POST.get("photo")
+                if not photo_data:
+                    print("No se encontró foto en el formulario")
+                    return render(request, "signup.html", {
+                        "form": UserCreationForm,
+                        "error": "No se encontró foto en el formulario"
+                    })
+
+                img_id = registro_facial(request.POST["username"], photo_data, request)
+
+                if img_id is None:
+                    print("No se detectaron rostros")
+                    return render(request, "signup.html", {
+                        "form": UserCreationForm(),
+                        "error": "No se detectaron rostros"
+                    })
+
+                if img_id is False:
+                    print("Error al decodificar la imagen")
+                    return render(request, "signup.html", {
+                        "form": UserCreationForm(),
+                        "error": "Error al decodificar la imagen"
+                    })
+
                 # Registrar Usuario
                 user = User.objects.create_user(
                     username=request.POST["username"],
@@ -30,11 +55,13 @@ def signup(request):
                 )
                 user.save()
 
-                # Obtener imagen_id del formulario
-                imagen_id = request.POST.get("imagen_id")
                 # Crear el perfil asociado al usuario
-                profile = Profile.objects.create( user=user, imagen_id=imagen_id, )
+                profile = Profile.objects.create(
+                    user=user,
+                    imagen_id=img_id,
+                )
                 profile.save()
+                print("Perfil creado exitosamente")
 
                 login(
                     request, user
@@ -150,7 +177,55 @@ def signin(request):  # Metodo para login
                     "error": "Usuario o contraseña incorrecta",
                 },
             )
+
+        photo_data = request.POST.get("photo")
+
+        if not photo_data:
+            print("No se encontró foto en el formulario")
+            return render(request, "signin.html", {
+                "form": AuthenticationForm,
+                "error": "No se encontró foto en el formulario"
+            })
+
         else:
-            login(request, user) #Guardamos la cookie ya que el usuario si existe
-            return redirect("tasks")        
+            profile = Profile.objects.get(user=user)
+            if profile and profile.imagen_id:
+                img_profile = profile.imagen_id
+                user_face = consultar_imagen_usuario(imagen_id=img_profile)
+
+                if user_face is False:
+                    print("El usuario no existe")
+                    return render(request, "signin.html", {
+                        "form": AuthenticationForm,
+                        "error": "El usuario no existe"
+                    })
+                if user_face is None:
+                    print("Error al recuperar la imagen")
+                    return render(request, "signin.html", {
+                        "form": AuthenticationForm,
+                        "error": "Error al recuperar la imagen"
+                    })
+
+                result = login_captura_facial(user_face, photo_data)
+                if result is True:
+                    login(request, user) #Guardamos la cookie ya que el usuario si existe
+                    return redirect("tasks")
+                if result is False:
+                    print("No coinciden los rostros")
+                    return render(request, "signin.html", {
+                        "form": AuthenticationForm,
+                        "error": "No coinciden lo suficiente los rostros"
+                    })
+                if result == -100:
+                    print("Error al decodificar la imagen")
+                    return render(request, "signin.html", {
+                        "form": UserCreationForm(),
+                        "error": "Error al decodificar la imagen"
+                    })
+                if result == -200:
+                    print("No se detectaron rostros")
+                    return render(request, "signin.html", {
+                        "form": UserCreationForm(),
+                        "error": "No se detectaron rostros"
+                    })
 

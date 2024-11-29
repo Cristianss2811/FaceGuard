@@ -6,5 +6,4 @@ urlpatterns = [
     path('crear/', roles_crear, name='roles_crear'),
     path('editar/<int:id>/', roles_editar, name='roles_editar'),
     path('eliminar/<int:id>/', roles_eliminar, name='roles_eliminar'),
-
 ]

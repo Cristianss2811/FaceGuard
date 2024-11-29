@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="display-3">Eliminar Roles de {{ usuario.nombre }} {{ usuario.apellido_p }} {{ usuario.apellido_m }}</h1>
+
+    {% if message %}
+        <div class="alert alert-info">{{ message }}</div>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Seleccionar</th>
+                    <th>Rol</th>
+                    <th>Fecha de Vencimiento</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for profile_role in roles_asignados %}
+                <tr>
+                    <td><input type="checkbox" name="roles" value="{{ profile_role.id }}"></td>
+                    <td>{{ profile_role.role.nombre }}</td>
+                    <td>{{ profile_role.fecha_vencimiento }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-danger mt-3">Eliminar Roles</button>
+    </form>
+</div>
+{% endblock %}

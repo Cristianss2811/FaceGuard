@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="display-3">Asignar Roles a {{ perfil.nombre }}</h1>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="roles">Selecciona Roles:</label>
+            <select multiple class="form-control" id="roles" name="roles">
+                {% for role in roles %}
+                <option value="{{ role.id }}">{{ role.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group mt-3">
+            <label for="fecha_vencimiento">Fecha de Vencimiento:</label>
+            <input type="date" class="form-control" id="fecha_vencimiento" name="fecha_vencimiento">
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Asignar Roles</button>
+    </form>
+</div>
+{% endblock %}
