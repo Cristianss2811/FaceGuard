@@ -35,5 +35,7 @@ urlpatterns = [
     path("zonas/", include("areas.zonas_urls")),
     path("puertas/", include("areas.puertas_urls")),
     path('roles/', include('usuarios.roles_urls')),
-    path('movimientos/', include('atencion.urls'))
+    path('movimientos/', include('atencion.urls')),
+    path('notificaciones/', include('notificaciones.urls')),
+
 ]

@@ -30,3 +30,8 @@ body {
 .sidebar-icon {
     margin-right: 10px;
 }
+
+body.modal-open {
+    overflow: hidden !important; /* Evita el scroll pero no cambia el margen */
+    padding-right: 0 !important; /* Evita que se agregue padding-right */
+}

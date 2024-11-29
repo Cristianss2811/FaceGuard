@@ -27,7 +27,7 @@
         <p class="text-uppercase px-3">Cuenta</p>
         <a href="#notificaciones"><i class="bi bi-bell sidebar-icon"></i>Notificaciones</a>
         <a href="#configuracion"><i class="bi bi-gear sidebar-icon"></i>Configuración</a>
-        <a href="/logout" class="mt-auto" data-page="logout" onclick="logout()""><i class="bi bi-box-arrow-left sidebar-icon"></i>Log Out</a>
+        <a href="/logout" class="mt-auto" data-page="logout" onclick="logout()"><i class="bi bi-box-arrow-left sidebar-icon"></i>Log Out</a>
     </div>
     {% endif %}
 
@@ -47,7 +47,52 @@
                     <li class="nav-item">
                         <a class="nav-link">{{ user.username }}</p>
                     </li>
-                    <a href="#notificaciones" class="mt-2"><i class="bi bi-bell sidebar-icon"></i></a>
+                    <div class="position-relative">
+                        <!-- Icono de notificaciones -->
+                        <div class="position-relative">
+                            <i id="campanita" class="bi bi-bell" style="font-size: 1.2rem; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#modal-notificaciones"></i>
+                            {% if notificaciones_no_leidas > 0 %}
+                            <span id="contador-notificaciones" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ notificaciones_no_leidas }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                     <!-- Modal de Notificaciones -->
+                        <div id="modal-notificaciones" class="modal fade" tabindex="-1" aria-labelledby="notificacionesModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="notificacionesModalLabel">Notificaciones</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul id="lista-notificaciones" class="list-group">
+                                            {% for notificacion in notificaciones %}
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <div>{{ notificacion.mensaje }}</div>
+                                                        <small class="text-muted">{{ notificacion.fecha_creacion|date:"d M Y H:i" }}</small>
+                                                    </div>
+                                                    {% if notificacion.leida %}
+                                                        <span class="badge bg-success">Leída</span>
+                                                    {% else %}
+                                                        <a href="{% url 'leer_notificacion' notificacion.id %}" class="btn btn-sm btn-primary">Marcar como leída</a>
+                                                    {% endif %}
+                                                </li>
+                                            {% empty %}
+                                                <li class="list-group-item">No tienes notificaciones.</li>
+                                            {% endfor %}
+                                        </ul>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    
+
+                    
                     <!-- <li class="nav-item">
                         <a class="nav-link" href="/puertas">Puertas</a>
                     </li>
@@ -74,6 +119,7 @@
               </div>
             </div>
         </nav>
+        
         
         <!-- Page content goes here -->
         {% block content %}
