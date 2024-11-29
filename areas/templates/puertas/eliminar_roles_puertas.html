@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="display-3">Eliminar Roles de {{ puerta.nombre }}</h1>
+
+    {% if message %}
+        <div class="alert alert-info">{{ message }}</div>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Seleccionar</th>
+                    <th>Rol</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for role in roles_asignados %}
+                <tr>
+                    <td style="width: 30%"><input type="checkbox" name="roles" value="{{ role.id }}"></td>
+                    <td>{{ role.rol.nombre }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-danger mt-3">Eliminar Roles</button>
+    </form>
+</div>
+{% endblock %}

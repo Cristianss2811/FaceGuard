@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Area, Puerta, Zona
+
+from usuarios.models import Roles
+from .models import Area, Puerta, Zona, PuertasRoles
 from .forms import AreaForm, PuertaForm, ZonaForm
 from django.contrib.auth.decorators import login_required
 
@@ -83,6 +85,44 @@ def puertas_eliminar(request, id):
         return redirect(puertas_listar)
     return render(request, 'puertas/puertas_eliminar.html', {'puerta': puerta})
 
+def puertas_asignar_roles(request, id):
+    puerta = get_object_or_404(Puerta, pk=id)
+    puertas_roles = PuertasRoles.objects.filter(puerta=puerta)
+    roles = Roles.objects.exclude(
+        id__in=puertas_roles.values_list('rol_id', flat=True)
+    )
+
+    if request.method == 'POST':
+        #Procesar los roles seleccionados
+        selected_roles = request.POST.getlist('roles')
+
+        for role_id in selected_roles:
+            role = get_object_or_404(Roles, pk=role_id)
+            PuertasRoles.objects.create(puerta=puerta, rol=role)
+        return redirect('puertas_listar')
+    return render(request, 'puertas/puertas_asignar_roles.html', {'puerta': puerta, 'roles': roles})
+
+@login_required
+def eliminar_roles_puertas(request, id):
+    puerta = get_object_or_404(Puerta, id=id)
+
+    if request.method == 'POST':
+        # Obtener los IDs de los roles seleccionados
+        roles_a_eliminar = request.POST.getlist('roles')
+
+        if roles_a_eliminar:
+            # Eliminar los roles seleccionados
+            PuertasRoles.objects.filter(id__in=roles_a_eliminar, puerta = puerta).delete()
+
+        return redirect('puertas_listar')  # Redirigir después de eliminar
+
+    # Para el GET, mostrar los roles actuales del usuario
+    roles_asignados = PuertasRoles.objects.filter(puerta = puerta)
+
+    return render(request, 'puertas/eliminar_roles_puertas.html', {
+        'puerta': puerta,
+        'roles_asignados': roles_asignados
+    })
 #-------------------------------------------------------------------------------------------------
 
 

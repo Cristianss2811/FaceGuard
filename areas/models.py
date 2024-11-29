@@ -1,4 +1,8 @@
+from django.contrib.admindocs.utils import ROLES
 from django.db import models
+
+from usuarios.models import Roles
+
 
 class Zona(models.Model):
     nombre = models.CharField(max_length=100)
@@ -32,7 +36,14 @@ class PuertasAreas(models.Model):
 
     def __str__(self):
         return f"{self.puerta.nombre} - {self.area.nombre}"   
-    
+
+class PuertasRoles(models.Model):
+    puerta = models.ForeignKey(Puerta, on_delete=models.CASCADE)
+    rol = models.ForeignKey(Roles, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.puerta.nombre} - {self.rol.nombre}"
+
 class ZonasAreas(models.Model):
     zona = models.ForeignKey(Zona, on_delete=models.CASCADE)
     area = models.ForeignKey(Area, on_delete=models.CASCADE)

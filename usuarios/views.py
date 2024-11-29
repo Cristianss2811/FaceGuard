@@ -121,7 +121,7 @@ def eliminar_roles_usuario(request, usuario_id):
     # Para el GET, mostrar los roles actuales del usuario
     roles_asignados = ProfileRole.objects.filter(profile=usuario)
 
-    return render(request, 'usuarios/eliminar_roles_usuario.html', {
+    return render(request, 'usuarios/eliminar_roles_puertas.html', {
         'usuario': usuario,
         'roles_asignados': roles_asignados
     })
