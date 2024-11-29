@@ -38,4 +38,5 @@ urlpatterns = [
     path('movimientos/', include('atencion.urls')),
     path('notificaciones/', include('notificaciones.urls')),
     path('usuarios/', include('usuarios.usuarios_urls')),
+    path('api/', include('API.api_urls')),
 ]
