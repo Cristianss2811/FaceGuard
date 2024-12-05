@@ -7,6 +7,7 @@ from django.db import IntegrityError
 from usuarios.utils.registro_facial import registro_facial, consultar_imagen_usuario, login_captura_facial
 from .forms import TaskForm
 from .models import Task
+from notificaciones.models import Notificacion
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from usuarios.models import Profile
@@ -158,6 +159,16 @@ def signout(request):
     logout(request)
     return redirect("home")
 
+def notificar_a_staff(mensaje):
+    staff_users = User.objects.filter(is_staff=True)
+    for staff_user in staff_users:
+        Notificacion.objects.create(
+            usuario=staff_user,
+            mensaje=mensaje,
+            leida=False,
+        )
+
+
 
 def signin(request):  # Metodo para login
     if request.method == "GET":
@@ -169,6 +180,8 @@ def signin(request):  # Metodo para login
             password=request.POST["password"],
         )
         if user is None:
+            mensaje = f"Intento fallido de ingreso con el nombre de usuario: {request.POST.get('username')}"
+            notificar_a_staff(mensaje)
             return render(
                 request,
                 "signin.html",
@@ -194,6 +207,8 @@ def signin(request):  # Metodo para login
                 user_face = consultar_imagen_usuario(imagen_id=img_profile)
 
                 if user_face is False:
+                    mensaje = "Intento fallido: usuario no reconocido por el sistema de reconocimiento facial."
+                    notificar_a_staff(mensaje)
                     print("El usuario no existe")
                     return render(request, "signin.html", {
                         "form": AuthenticationForm,
@@ -211,6 +226,8 @@ def signin(request):  # Metodo para login
                     login(request, user) #Guardamos la cookie ya que el usuario si existe
                     return redirect("tasks")
                 if result is False:
+                    mensaje = "No coinciden lo suficiente los rostros"
+                    notificar_a_staff(f"Intento fallido: {mensaje}")
                     print("No coinciden los rostros")
                     return render(request, "signin.html", {
                         "form": AuthenticationForm,
@@ -223,6 +240,8 @@ def signin(request):  # Metodo para login
                         "error": "Error al decodificar la imagen"
                     })
                 if result == -200:
+                    mensaje = "Alguien intento ingresar pero no se encontraron rostros"
+                    notificar_a_staff(f"Intento fallido: {mensaje}")
                     print("No se detectaron rostros")
                     return render(request, "signin.html", {
                         "form": UserCreationForm(),
