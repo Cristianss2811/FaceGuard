@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'notificaciones',
     'atencion',
     'rest_framework',
-    'API'
+    'API',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [

@@ -2,7 +2,8 @@ from django.urls import path
 
 from API.views import AreaListAPIView, AreaCreateAPIView, AreaRetrieveAPIView, AreaDestroyAPIView, AreaUpdateAPIView, \
     ZonaListAPIView, ZonaCreateAPIView, ZonaRetrieveAPIView, ZonaDestroyAPIView, ZonaUpdateAPIView, PuertaListAPIView, \
-    PuertaCreateAPIView, PuertaRetrieveAPIView, PuertaDestroyAPIView, PuertaUpdateAPIView
+    PuertaCreateAPIView, PuertaRetrieveAPIView, PuertaDestroyAPIView, PuertaUpdateAPIView, register, profile
+from API.views import login
 
 urlpatterns = [
     path('areas/list', AreaListAPIView.as_view(), name='area_list'),
@@ -22,4 +23,8 @@ urlpatterns = [
     path('puertas/retrieve/<pk>', PuertaRetrieveAPIView.as_view(), name='puertas-detail'),
     path('puertas/delete/<pk>', PuertaDestroyAPIView.as_view(), name='puertas-delete'),
     path('puertas/update/<pk>', PuertaUpdateAPIView.as_view(), name='puertas-update'),
+
+    path('login', login),
+    path('register', register),
+    path('profile', profile),
 ]
