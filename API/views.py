@@ -11,7 +11,8 @@ from API.areas.AreaSerializer import AreaListSerializer, AreaCreateSerializer, A
 from API.login.LoginSerializer import LoginSerializer
 from API.puertas.PuertaSerializer import PuertaListSerializer, PuertaCreateSerializer, PuertaUpdateSerializer
 from API.zonas.ZonaSerializer import ZonaListSerializer, ZonaCreateSerializer, ZonaUpdateSerializer
-from areas.models import Area, Zona, Puerta
+from API.roles.RolesSerializer import RolesListSerializer, RolesCreateSerializer, RolesUpdateSerializer
+from areas.models import Area, Zona, Puerta, Roles
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
@@ -174,3 +175,39 @@ def profile(request):
     print(request.data)
 
     return Response({"username": request.user.username}, status=status.HTTP_200_OK)
+
+
+'''
+API's de la tabla Roles
+'''
+
+@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
+@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+class RolesListAPIView(ListAPIView):
+    def get_queryset(self):
+        return Roles.objects.all()
+
+    serializer_class = RolesListSerializer
+
+@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
+@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+class RolesCreateAPIView(CreateAPIView):
+    serializer_class = RolesListSerializer
+
+@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
+@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+class RolesRetrieveAPIView(RetrieveAPIView):
+    serializer_class = RolesCreateSerializer
+    queryset = Roles.objects.all()
+
+@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
+@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+class RolesDestroyAPIView(DestroyAPIView):
+    serializer_class = RolesCreateSerializer
+    queryset = Roles.objects.all()
+
+@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
+@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+class RolesUpdateAPIView(UpdateAPIView):
+    serializer_class = RolesUpdateSerializer
+    queryset = Roles.objects.all()
