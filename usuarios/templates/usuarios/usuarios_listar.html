@@ -7,8 +7,12 @@
 <link rel="stylesheet" href="{% static 'css/data_table.css' %}">
 
 <div class="container mt-5">
-    <h1 class="display-3">Usuarios</h1>
-    
+    {% if usuari %}
+        <h1 class="display-3">Usuario</h1>
+    {% endif %}
+    {% if request.user.is_staff %}
+        <h1 class="display-3">Usuarios</h1>
+    {% endif %}
     <table id="usuariosTable" class="table table-striped mt-5">
         <thead style="background-color: #066699 !important; color: white !important;">
             <!--<a href="{% url 'roles_crear' %}" class="btn" style="background-color: #066699; color: white;">
@@ -21,45 +25,78 @@
                 <th>Estado</th>
                 <th>Teléfono</th>
                 <th>Roles</th>
-                <th>Acciones</th>
+                {% if usuari %}
+                    <th>Editar</th>
+                {% endif %}
+                {% if request.user.is_staff %}
+                    <th>Acciones</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
-            {% for usuario in usuarios %}
-            <tr>
-                <td>{{ usuario.nombre|add:" " }}{{ usuario.apellido_p|add:" " }}{{ usuario.apellido_m }}</td>
-                <td>{{ usuario.direccion }}</td>
-                <td>{{ usuario.ciudad }}</td>
-                <td>{{ usuario.estado }}</td>
-                <td>{{ usuario.telefono }}</td>
+            {% if request.user.is_staff %}
+                {% for usuario in usuarios %}
+                <tr>
+                    <td>{{ usuario.nombre|add:" " }}{{ usuario.apellido_p|add:" " }}{{ usuario.apellido_m }}</td>
+                    <td>{{ usuario.direccion }}</td>
+                    <td>{{ usuario.ciudad }}</td>
+                    <td>{{ usuario.estado }}</td>
+                    <td>{{ usuario.telefono }}</td>
 
-                <td>
-                    {% if usuario.roles %}
-                        {% for perfil_rol in usuario.roles %}
-                            <span class="badge bg-primary">{{ perfil_rol.role.nombre }}</span>
-                        {% endfor %}
-                    {% else %}
-                        <span> - </span>
-                    {% endif %}
-                </td>
+                    <td>
+                        {% if usuario.roles %}
+                            {% for perfil_rol in usuario.roles %}
+                                <span class="badge bg-primary">{{ perfil_rol.role.nombre }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span> - </span>
+                        {% endif %}
+                    </td>
 
-                <td>
-                    <a href="{% url 'usuarios_editar' usuario.user_id %}" class="btn btn-sm btn-success">
-                        <i class="bi bi-pencil-fill"></i>
-                    </a>
-                    <!--<button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ usuario.user_id }}">
-                        <i class="bi bi-trash-fill"></i>
-                    </button>-->
-                    <a href="{% url 'usuarios_asignar_roles' usuario.user_id %}" class="btn btn-sm btn-primary">
-                    <i class="bi bi-person-plus-fill"></i>
-                    </a>
-                    <a href="{% url 'eliminar_roles_usuario' usuario.user_id %}" class="btn btn-sm btn-danger">
-                     <i class="bi bi-trash-fill"></i>
-                    </a>
-                </td>
-            </tr>
-            {% include 'modal_eliminar.html' with object_id=usuario.user_id object_name=usuario.nombre delete_url='usuarios_eliminar' %}
-            {% endfor %}
+                    <td>
+                        <a href="{% url 'usuarios_editar' usuario.user_id %}" class="btn btn-sm btn-success">
+                            <i class="bi bi-pencil-fill"></i>
+                        </a>
+                        <!--<button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ usuario.user_id }}">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>-->
+                        <a href="{% url 'usuarios_asignar_roles' usuario.user_id %}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-person-plus-fill"></i>
+                        </a>
+                        <a href="{% url 'eliminar_roles_usuario' usuario.user_id %}" class="btn btn-sm btn-danger">
+                         <i class="bi bi-trash-fill"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% include 'modal_eliminar.html' with object_id=usuario.user_id object_name=usuario.nombre delete_url='usuarios_eliminar' %}
+                {% endfor %}
+            {% endif %}
+            {% if usuari %}
+                <tr>
+                    <td>{{ usuari.nombre|add:" " }}{{ usuari.apellido_p|add:" " }}{{ usuari.apellido_m }}</td>
+                    <td>{{ usuari.direccion }}</td>
+                    <td>{{ usuari.ciudad }}</td>
+                    <td>{{ usuari.estado }}</td>
+                    <td>{{ usuari.telefono }}</td>
+
+                    <td>
+                        {% if usuari.roles %}
+                            {% for perfil_rol in usuari.roles %}
+                                <span class="badge bg-primary">{{ perfil_rol.role.nombre }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span> - </span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <a href="{% url 'usuarios_editar' usuari.user_id %}" class="btn btn-sm btn-success">
+                            <i class="bi bi-pencil-fill"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% include 'modal_eliminar.html' with object_id=usuari.user_id object_name=usuari.nombre delete_url='usuarios_eliminar'%}
+            {% endif %}
         </tbody>
     </table>
 </div>

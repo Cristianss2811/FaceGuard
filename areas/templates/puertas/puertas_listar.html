@@ -11,9 +11,11 @@
 
         <table id="areasTable" class="table table-striped mt-5">
             <thead style="background-color: #066699 !important; color: white !important;">
+            {% if request.user.is_staff %}
                 <a href="{% url 'puertas_crear' %}" class="btn" style="background-color: #066699; color: white;">
                     <i class="bi bi-plus-lg"></i> Añadir
                 </a>
+            {% endif %}
                 <tr>
                     <th>Nombre</th>
                     <th>Descripción</th>
@@ -34,19 +36,21 @@
                     </td>
                     <td>{{ puerta.activo }}</td>
                     <td>
-                        <a href="{% url 'puertas_editar' puerta.id %}" class="btn btn-sm btn-success">
-                            <i class="bi bi-pencil-fill"></i>
-                        </a>
-                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
-                                data-bs-target="#deleteModal{{ puerta.id }}">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
-                        <a href="{% url 'puertas_asignar_roles' puerta.id %}" class="btn btn-sm btn-primary">
-                            <i class="bi bi-person-plus-fill"></i>
-                        </a>
-                        <a href="{% url 'eliminar_roles_puertas' puerta.id %}" class="btn btn-sm btn-danger">
-                            <i class="bi bi-person-dash"></i>
-                        </a>
+                        {% if request.user.is_staff %}
+                            <a href="{% url 'puertas_editar' puerta.id %}" class="btn btn-sm btn-success">
+                                <i class="bi bi-pencil-fill"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal{{ puerta.id }}">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                            <a href="{% url 'puertas_asignar_roles' puerta.id %}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-person-plus-fill"></i>
+                            </a>
+                            <a href="{% url 'eliminar_roles_puertas' puerta.id %}" class="btn btn-sm btn-danger">
+                                <i class="bi bi-person-dash"></i>
+                            </a>
+                        {% endif %}
                         <!-- Botón de "Acceso" para capturar foto -->
                         <button type="button" class="btn btn-sm btn-warning verificarAccesoBtn" data-puerta-id="{{ puerta.id }}">
                             <i class="bi bi-key-fill"></i> Acceso

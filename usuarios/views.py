@@ -59,9 +59,14 @@ VIEWS Profile (usuarios)
 @login_required
 def profile_listar(request):
     perfiles = Profile.objects.all()
+    perf = Profile.objects.filter(user=request.user).first()
     for perfil in perfiles:
         perfil.roles = perfil.profilerole_set.all()
-    return render(request, 'usuarios/usuarios_listar.html', {'usuarios': perfiles})
+    if perf:
+        perf.roles = list(perf.profilerole_set.all())
+    else:
+        perf = None
+    return render(request, 'usuarios/usuarios_listar.html', {'usuarios': perfiles, "usuari": perf})
 
 """
 @login_required
@@ -138,12 +143,13 @@ def eliminar_roles_usuario(request, usuario_id):
 
 @login_required
 def profile_completar(request, id):
-    perfil = get_object_or_404(User, id=id)
+    from tasks.views import tasks
+    perfil = get_object_or_404(Profile, user_id=id)
     if request.method == 'POST':
         form = ProfileForm(request.POST, instance=perfil)
         if form.is_valid():
             form.save()
-            return redirect(profile_listar)
+            return redirect(tasks)
     else:
         form = ProfileForm(instance=perfil)
     return render(request, 'usuarios/usuarios_completar.html', {'form': form, 'perfil': perfil})
