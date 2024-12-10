@@ -4,7 +4,6 @@
 {% block content %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css">
-
     <link rel="stylesheet" href="{% static 'css/data_table.css' %}">
 
     <div class="container mt-5">
@@ -12,16 +11,16 @@
 
         <table id="areasTable" class="table table-striped mt-5">
             <thead style="background-color: #066699 !important; color: white !important;">
-            <a href="{% url 'puertas_crear' %}" class="btn" style="background-color: #066699; color: white;">
-                <i class="bi bi-plus-lg"></i> Añadir
-            </a>
-            <tr>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Area</th>
-                <th>Activo</th>
-                <th>Acciones</th>
-            </tr>
+                <a href="{% url 'puertas_crear' %}" class="btn" style="background-color: #066699; color: white;">
+                    <i class="bi bi-plus-lg"></i> Añadir
+                </a>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Area</th>
+                    <th>Activo</th>
+                    <th>Acciones</th>
+                </tr>
             </thead>
             <tbody>
             {% for puerta in puertas %}
@@ -48,6 +47,10 @@
                         <a href="{% url 'eliminar_roles_puertas' puerta.id %}" class="btn btn-sm btn-danger">
                             <i class="bi bi-person-dash"></i>
                         </a>
+                        <!-- Botón de "Acceso" para capturar foto -->
+                        <button type="button" class="btn btn-sm btn-warning verificarAccesoBtn" data-puerta-id="{{ puerta.id }}">
+                            <i class="bi bi-key-fill"></i> Acceso
+                        </button>
                     </td>
                 </tr>
                 {% include 'modal_eliminar.html' with object_id=puerta.id object_name=puerta.nombre delete_url='puertas_eliminar' %}
@@ -56,23 +59,96 @@
         </table>
     </div>
 
+    <!-- Modal de captura de cámara -->
+    <div id="cameraModal" style="display: none;">
+        <video id="video" width="640" height="480" style="display: none;"></video>
+        <canvas id="canvas" style="display: none;"></canvas>
+        <div id="status"></div>
+        <button onclick="startCamera()">Iniciar Cámara</button>
+        <button onclick="capturePhoto()">Capturar Foto</button>
+        <img id="capturedImage" style="display: none;" />
+        <form id="photoForm" method="POST" action="#">
+            {% csrf_token %}
+            <input type="hidden" id="photo" name="photo" />
+            <input type="submit" value="Enviar Foto" />
+        </form>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
-
     <script src="{% static 'js/data_table.js' %}"></script>
 
-    <!-- DataTables Initialization -->
     <script>
-        $(document).ready(function () {
-            $('#areasTable').DataTable({
-                // Opciones adicionales (ej. idioma, paginación, longitud de página)
-                "language": {}
-            });
+    $(document).ready(function () {
+        $('#areasTable').DataTable({
+            "language": {}
         });
-    </script>
+    });
+
+    // Delegación de eventos: Asignamos el evento click a un contenedor superior
+    document.querySelector('tbody').addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('verificarAccesoBtn')) {
+            e.preventDefault(); // Evitar que se siga el enlace
+
+            // Obtener el ID de la puerta del atributo data-puerta-id
+            var puertaId = e.target.getAttribute('data-puerta-id');
+            // Cambiar el action del formulario para incluir el puerta_id
+            var actionUrl = "{% url 'verificar_rostro_acceso' 0 %}".replace('/0/', '/' + puertaId + '/');
+            document.getElementById('photoForm').action = actionUrl;
+
+            //document.getElementById("cameraModal").style.display = "block"; // Mostrar el modal
+            startCamera(); // Iniciar la cámara
+        }
+    });
+
+    // Función para iniciar la cámara
+    function startCamera() {
+        navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function(stream) {
+            var video = document.getElementById('video');
+            video.srcObject = stream;
+            video.style.display = "block";
+            video.play();
+            document.getElementById('status').innerText = "Cámara iniciada, capturando en 5 segundos...";
+            setTimeout(function() {
+                capturePhoto(stream);  // Pasamos el stream para detenerlo después
+            }, 5000); // Captura después de 5 segundos
+        })
+        .catch(function(err) {
+            console.error("Error accediendo a la cámara: " + err);
+            document.getElementById('status').innerText = "Error accediendo a la cámara: " + err;
+        });
+    }
+
+    // Función para capturar la foto
+    function capturePhoto(stream) {
+        var video = document.getElementById('video');
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+
+        // Establecer las dimensiones del canvas según el video
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        // Dibujar el video en el canvas
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        var photo = canvas.toDataURL('image/png'); // Convertir a base64
+        document.getElementById('photo').value = photo; // Asignar la foto al campo oculto
+
+        document.getElementById('status').innerText = "Foto capturada";
+
+        // Detener la cámara
+        video.style.display = "none";
+        stream.getTracks().forEach(track => track.stop());
+
+        // Enviar el formulario automáticamente
+        document.getElementById('photoForm').submit();
+    }
+</script>
 {% endblock %}
+
 
 
 
