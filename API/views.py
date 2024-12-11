@@ -5,16 +5,20 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework import status, permissions
 from rest_framework.authtoken.models import Token
+from rest_framework.views import APIView
 from tutorial.quickstart.serializers import UserSerializer
 
 from API.areas.AreaSerializer import AreaListSerializer, AreaCreateSerializer, AreaUpdateSerializer
 from API.login.LoginSerializer import LoginSerializer
+from API.notificaciones.NotificacionSerializer import NotificacionSerializer
 from API.puertas.PuertaSerializer import PuertaListSerializer, PuertaCreateSerializer, PuertaUpdateSerializer
 from API.zonas.ZonaSerializer import ZonaListSerializer, ZonaCreateSerializer, ZonaUpdateSerializer
 from API.roles.RolesSerializer import RolesListSerializer, RolesCreateSerializer, RolesUpdateSerializer
 from areas.models import Area, Zona, Puerta, Roles
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
+
+from notificaciones.models import Notificacion
 
 UserModel = get_user_model()
 
@@ -211,3 +215,32 @@ class RolesDestroyAPIView(DestroyAPIView):
 class RolesUpdateAPIView(UpdateAPIView):
     serializer_class = RolesUpdateSerializer
     queryset = Roles.objects.all()
+
+"""
+API's de Notificaciones
+"""
+
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])
+class NotificacionListAPIView(ListAPIView):
+    serializer_class = NotificacionSerializer
+
+    def get_queryset(self):
+        # Retorna solo las notificaciones del usuario autenticado
+        return Notificacion.objects.filter(usuario=self.request.user).order_by('-fecha_creacion')
+
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])
+class NotificacionMarkAsReadAPIView(APIView):
+
+    def patch(self, request, pk):
+        try:
+            # Busca la notificación del usuario autenticado
+            notificacion = Notificacion.objects.get(pk=pk, usuario=request.user)
+            notificacion.leida = True
+            notificacion.save()
+            return Response({'status': 'Notificación marcada como leída'})
+        except Notificacion.DoesNotExist:
+            return Response({'error': 'Notificación no encontrada'}, status = 404)

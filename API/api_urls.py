@@ -3,7 +3,8 @@ from django.urls import path
 from API.views import AreaListAPIView, AreaCreateAPIView, AreaRetrieveAPIView, AreaDestroyAPIView, AreaUpdateAPIView, \
     ZonaListAPIView, ZonaCreateAPIView, ZonaRetrieveAPIView, ZonaDestroyAPIView, ZonaUpdateAPIView, PuertaListAPIView, \
     PuertaCreateAPIView, PuertaRetrieveAPIView, PuertaDestroyAPIView, PuertaUpdateAPIView, register, profile, \
-    RolesListAPIView, RolesCreateAPIView, RolesRetrieveAPIView, RolesDestroyAPIView, RolesUpdateAPIView
+    RolesListAPIView, RolesCreateAPIView, RolesRetrieveAPIView, RolesDestroyAPIView, RolesUpdateAPIView, \
+    NotificacionListAPIView, NotificacionMarkAsReadAPIView
 from API.views import login
 
 urlpatterns = [
@@ -34,4 +35,7 @@ urlpatterns = [
     path('roles/retrieve/<pk>', RolesRetrieveAPIView.as_view(), name='roles-detail'),
     path('roles/delete/<pk>', RolesDestroyAPIView.as_view(), name='roles-delete'),
     path('roles/update/<pk>', RolesUpdateAPIView.as_view(), name='roles-update'),
+
+    path('notificaciones/list', NotificacionListAPIView.as_view(), name='notificaciones_list'),
+    path('notificaciones/marcar-leida/<pk>', NotificacionMarkAsReadAPIView.as_view(), name='notificaciones_mark_as_read'),
 ]
