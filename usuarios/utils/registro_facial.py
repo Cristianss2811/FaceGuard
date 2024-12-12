@@ -52,6 +52,7 @@ def load_facenet_model():
     try:
         with custom_object_scope({'L2Normalization': L2Normalization}):
             archivo = os.path.join(os.path.dirname(__file__), 'facenet_keras.h5')
+            #archivo = os.path.join(os.path.dirname(__file__), 'facenet512.h5')
             facenet = load_model(archivo, custom_objects={'tf': tf})
             # (None, 160, 160, 3) entrada: imagen 160x160 RGB
             # (None, 128) salida: vector 128 elementos
@@ -59,6 +60,19 @@ def load_facenet_model():
     except EOFError as e:
         print("Error al cargar el modelo:", e)
         return None
+
+"""
+def load_vgg_model():
+    try:
+        with custom_object_scope({'L2Normalization': L2Normalization}):
+            archivo = os.path.join(os.path.dirname(__file__), 'vgg.h5')
+            vgg = load_model(archivo, custom_objects={'tf': tf})
+            print(vgg.input_shape)
+            return vgg
+    except EOFError as e:
+        print("Error al cargar el modelo:", e)
+        return None
+"""
 
 def detect_faces(image, score_threshold=0.7):
     global boxes, scores
@@ -131,7 +145,7 @@ def imagen_register_mongodb(bd, coleccion, rostro, name):
         return None
 
 # Funcion que registra el rostro, lo captura y almacena de acuerdo a los requerimientos de Facenet
-def registro_facial(usuario, frame, request):
+def registro_facial(usuario, frame):
 
     # Decodificar la imagen base64
     photo_data = frame.split(",")[1]  # Elimina el prefijo de tipo
@@ -160,6 +174,7 @@ def registro_facial(usuario, frame, request):
         frame = draw_box(frame, box, (0, 2575, 0))  # Dibuja un cuadro alrededor de cada rostro detectado
 
     # Extraer las caras del marco
+    #faces = extract_faces(frame, bboxes)
     faces = extract_faces(frame, bboxes)
     #rostro = faces[0] if faces else frame  # Usa la primera cara o el marco completo si no hay caras
     rostro = faces[0]
@@ -215,6 +230,7 @@ def consultar_imagen_usuario(bd="FACEGUARD", coleccion="Register", imagen_id="")
         return None
 
 def login_captura_facial(user_face, frame):
+    num = 1
     # Decodificar la imagen base64
     photo_data = frame.split(",")[1]  # Elimina el prefijo de tipo
     img_data = base64.b64decode(photo_data)
@@ -240,6 +256,7 @@ def login_captura_facial(user_face, frame):
         frame = draw_box(frame, box, (0, 2575, 0))
 
     # Extraer las caras del marco
+    #faces = extract_faces(frame, bboxes)
     faces = extract_faces(frame, bboxes)
     # rostro = faces[0] if faces else frame  # Usa la primera cara o el marco completo si no hay caras
     login_face = faces[0]
@@ -248,21 +265,45 @@ def login_captura_facial(user_face, frame):
     #plt.imshow(login_face)
     #plt.show()
 
-    # Cargar facenet y calcular embeddings de cada rostro
     facenet = load_facenet_model()
-    user_embedding = calcular_embedding(facenet, user_face)
-    login_embedding = calcular_embedding(facenet, login_face)
+    user_embeddingf = calcular_embedding(facenet, user_face)
+    login_embeddingf = calcular_embedding(facenet, login_face)
+
+    """
+    vgg = load_vgg_model()
+    user_embeddingv = calcular_embedding(vgg, user_face)
+    login_embeddingv = calcular_embedding(vgg, login_face)
+    """
 
     # Comparar los embeddings de los dos rostros
-    dist = np.linalg.norm(user_embedding - login_embedding)
-    print(dist)
-    umbral_dist = 0.250000000
-    if dist < umbral_dist:
+    distf = np.linalg.norm(user_embeddingf - login_embeddingf)
+    print("facenet: " + str(distf))
+    umbral_dist = 0.350000000
+    if distf < umbral_dist:
         print("Acceso concedido: Los rostros coinciden.")
         return True
+        #num=num+1
     else:
         print("Acceso denegado: Los rostros no coinciden.")
         return False
+    """
+    distv = np.linalg.norm(user_embeddingv - login_embeddingv)
+    print("vgg: " + str(distv))
+    umbral_dist = 0.250000000
+    if distv < umbral_dist:
+        print("Acceso concedido: Los rostros coinciden.")
+        #return True
+        num = num + 1
+    else:
+        print("Acceso denegado: Los rostros no coinciden.")
+        #return False
+    if num > 0:
+        return True
+    else:
+        return False
+    """
+
+
 
 
 #consultar_imagen_usuario(imagen_id="6727eff8f682adb67b90b6df")

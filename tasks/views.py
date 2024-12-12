@@ -1,10 +1,11 @@
-
+import requests
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from django.db import IntegrityError
 from usuarios.utils.registro_facial import registro_facial, consultar_imagen_usuario, login_captura_facial
+from usuarios.views import profile_completar
 from .forms import TaskForm
 from .models import Task
 from notificaciones.models import Notificacion
@@ -23,6 +24,16 @@ def signup(request):
     if request.method == "GET":
         return render(request, "signup.html", {"form": UserCreationForm})
     else:
+        if not request.POST["username"]:
+            return render(request, "signup.html", {
+                "form": UserCreationForm,
+                "error": "Coloca el campo username"
+            })
+        if not request.POST["password1"] or not request.POST["password2"]:
+            return render(request, "signup.html", {
+                "form": UserCreationForm,
+                "error": "Coloca el password"
+            })
         if request.POST["password1"] == request.POST["password2"]:
             try:
                 photo_data = request.POST.get("photo")
@@ -33,8 +44,26 @@ def signup(request):
                         "error": "No se encontró foto en el formulario"
                     })
 
-                img_id = registro_facial(request.POST["username"], photo_data, request)
+                #img_id = registro_facial(request.POST["username"], photo_data)
 
+                response = requests.post(
+                    "https://microservicio-fr-api.onrender.com/registro/",
+                    data={"usuario": request.POST["username"], "photo": photo_data},
+                )
+
+                response.raise_for_status()
+
+                api_response = response.json()
+
+                if not api_response.get("success"):
+                    return render(request, "signup.html", {
+                        "form": UserCreationForm(),
+                        "error": api_response.get("error"),
+                    })
+
+                img_id = api_response.get("img_id")
+
+                """
                 if img_id is None:
                     print("No se detectaron rostros")
                     return render(request, "signup.html", {
@@ -48,6 +77,7 @@ def signup(request):
                         "form": UserCreationForm(),
                         "error": "Error al decodificar la imagen"
                     })
+                """
 
                 # Registrar Usuario
                 user = User.objects.create_user(
@@ -64,11 +94,9 @@ def signup(request):
                 profile.save()
                 print("Perfil creado exitosamente")
 
-                login(
-                    request, user
-                )  # Creo la cookie para que el navegador sepa que hay un usuario logeado
+                login(request, user)  # Creo la cookie para que el navegador sepa que hay un usuario logeado
 
-                return redirect(tasks)  # Me envia a tasks.html
+                return redirect(profile_completar, id=profile.user_id)
             except IntegrityError:
                 return render(  # Aqui retornamos a la misma vista y el mismo formulario
                     request,
@@ -180,7 +208,7 @@ def signin(request):  # Metodo para login
             password=request.POST["password"],
         )
         if user is None:
-            mensaje = f"Intento fallido de ingreso con el nombre de usuario: {request.POST.get('username')}"
+            mensaje = f"Intento fallido de ingreso, usuario: {request.POST.get('username')}"
             notificar_a_staff(mensaje)
             return render(
                 request,
@@ -191,6 +219,9 @@ def signin(request):  # Metodo para login
                 },
             )
 
+        login(request, user)  # Guardamos la cookie ya que el usuario si existe
+        return redirect("tasks")
+        """
         photo_data = request.POST.get("photo")
 
         if not photo_data:
@@ -247,4 +278,5 @@ def signin(request):  # Metodo para login
                         "form": UserCreationForm(),
                         "error": "No se detectaron rostros"
                     })
+        """
 

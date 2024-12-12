@@ -1,10 +1,94 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block content %}
+<main class="container">
+  <div class="row">
+    <div class="col-md-6 offset-md-3 mt-5">
+        <form action="{% url 'usuarios_editar' perfil.user_id %}" method="POST" class="card card-body shadow-sm p-4">
+          <h1 class="display-5 text-center mb-4">Completar Perfil</h1>
+          {% if form.non_field_errors %}
+              <div class="alert alert-danger">
+                  {{ form.non_field_errors }}
+              </div>
+          {% endif %}
+          {% csrf_token %}
+
+          <!-- Campo Nombre -->
+          <div class="mb-3">
+              <label for="id_nombre" class="form-label">Nombre</label>
+              <input type="text" name="nombre" id="id_nombre" class="form-control">
+          </div>
+
+          <!-- Campo Apellido Paterno -->
+          <div class="mb-3">
+              <label for="id_apellido_p" class="form-label">Apellido Paterno</label>
+              <input type="text" name="apellido_p" id="id_apellido_p" class="form-control">
+          </div>
+
+          <!-- Campo Apellido Materno -->
+          <div class="mb-3">
+              <label for="id_apellido_m" class="form-label">Apellido Materno</label>
+              <input type="text" name="apellido_m" id="id_apellido_m" class="form-control">
+          </div>
+
+          <!-- Campo Fecha de Nacimiento -->
+          <div class="mb-3">
+              <label for="id_fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+              <input type="text" name="fecha_nacimiento" id="id_fecha_nacimiento" class="form-control datepicker">
+          </div>
+
+          <!-- Campo NSS -->
+          <div class="mb-3">
+              <label for="id_nss" class="form-label">Número de Seguro Social</label>
+              <input type="text" name="nss" id="id_nss" class="form-control">
+          </div>
+
+          <!-- Campo Sexo -->
+          <div class="mb-3">
+              <label for="id_sexo" class="form-label">Sexo</label>
+              <select name="sexo" id="id_sexo" class="form-control">
+                  <option value="M" {% if form.sexo.value == 'M' %}selected{% endif %}>Masculino</option>
+                  <option value="F" {% if form.sexo.value == 'F' %}selected{% endif %}>Femenino</option>
+                  <option value="O" {% if form.sexo.value == 'O' %}selected{% endif %}>Otro</option>
+              </select>
+          </div>
+
+          <!-- Otros campos -->
+          <div class="mb-3">
+              <label for="id_direccion" class="form-label">Dirección</label>
+              <input type="text" name="direccion" id="id_direccion" class="form-control">
+          </div>
+          <div class="mb-3">
+              <label for="id_ciudad" class="form-label">Ciudad</label>
+              <input type="text" name="ciudad" id="id_ciudad" class="form-control">
+          </div>
+          <div class="mb-3">
+              <label for="id_estado" class="form-label">Estado</label>
+              <input type="text" name="estado" id="id_estado" class="form-control">
+          </div>
+          <div class="mb-3">
+              <label for="id_telefono" class="form-label">Teléfono</label>
+              <input type="text" name="telefono" id="id_telefono" class="form-control">
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 mt-3">Guardar</button>
+        </form>
+    </div>
+  </div>
+</main>
+
+<!-- Incluye JavaScript para el calendario -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('.datepicker').datepicker({
+      format: 'yyyy-mm-dd',
+      autoclose: true,
+      todayHighlight: true,
+      language: 'es'
+    });
+  });
+</script>
+{% endblock %}

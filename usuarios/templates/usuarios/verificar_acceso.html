@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main class="container">
+  <h1 class="mt-5">Verificación de Acceso</h1>
+  
+  {% if acceso %}
+    <div class="alert alert-success">¡Tienes acceso a esta puerta!</div>
+  {% else %}
+    <div class="alert alert-danger">No tienes acceso a esta puerta.</div>
+  {% endif %}
+  
+  <a href="{% url 'puertas_listar' %}" class="btn btn-primary mt-3">Volver</a>
+</main>
+{% endblock %}

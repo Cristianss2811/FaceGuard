@@ -17,12 +17,22 @@
         <hr>
         <p class="text-uppercase px-3">Acceso Rápido</p>
         <a href="#dashboard" class="sidebar-link" data-page="dashboard"><i class="bi bi-house-door sidebar-icon"></i>Dashboard</a>
-        <a href="/usuarios" class="sidebar-link" data-page="usuarios"><i class="bi bi-person sidebar-icon"></i>Usuarios</a>
-        <a href="/roles" class="sidebar-link" data-page="roles"><i class="bi bi-people sidebar-icon"></i>Roles</a>
-        <a href="/puertas" class="sidebar-link" data-page="puertas"><i class="bi bi-door-closed sidebar-icon"></i>Puertas</a>
-        <a href="/zonas" class="sidebar-link" data-page="zonas"><i class="bi bi-arrows-fullscreen sidebar-icon"></i>Zonas</a>
-        <a href="/areas" class="sidebar-link" data-page="areas"><i class="bi bi-geo-alt sidebar-icon"></i>Áreas</a>
-        <a href="/movimientos" class="sidebar-link" data-page="movimientos"><i class="bi bi-arrow-left-right sidebar-icon"></i>Movimientos</a>
+        {% if user.is_staff %}
+            <a href="/usuarios" class="sidebar-link" data-page="usuarios"><i class="bi bi-person sidebar-icon"></i>Usuarios</a>
+            <a href="/roles" class="sidebar-link" data-page="roles"><i class="bi bi-people sidebar-icon"></i>Roles</a>
+            <a href="/puertas" class="sidebar-link" data-page="puertas"><i class="bi bi-door-closed sidebar-icon"></i>Puertas</a>
+            <a href="/zonas" class="sidebar-link" data-page="zonas"><i class="bi bi-arrows-fullscreen sidebar-icon"></i>Zonas</a>
+            <a href="/areas" class="sidebar-link" data-page="areas"><i class="bi bi-geo-alt sidebar-icon"></i>Áreas</a>
+            <a href="/movimientos" class="sidebar-link" data-page="movimientos"><i class="bi bi-arrow-left-right sidebar-icon"></i>Movimientos</a>
+        {% endif %}
+        {% if not user.is_staff %}
+            <a href="/usuarios" class="sidebar-link" data-page="usuarios"><i class="bi bi-person sidebar-icon"></i>Usuario</a>
+            <!--<a href="/roles" class="sidebar-link" data-page="roles"><i class="bi bi-people sidebar-icon"></i>Roles</a>-->
+            <a href="/puertas" class="sidebar-link" data-page="puertas"><i class="bi bi-door-closed sidebar-icon"></i>Puertas</a>
+            <!--<a href="/zonas" class="sidebar-link" data-page="zonas"><i class="bi bi-arrows-fullscreen sidebar-icon"></i>Zonas</a>-->
+            <!--<a href="/areas" class="sidebar-link" data-page="areas"><i class="bi bi-geo-alt sidebar-icon"></i>Áreas</a>-->
+            <!--<a href="/movimientos" class="sidebar-link" data-page="movimientos"><i class="bi bi-arrow-left-right sidebar-icon"></i>Movimientos</a>-->
+        {% endif %}
         <hr>
         <p class="text-uppercase px-3">Cuenta</p>
         <a href="#notificaciones"><i class="bi bi-bell sidebar-icon"></i>Notificaciones</a>
