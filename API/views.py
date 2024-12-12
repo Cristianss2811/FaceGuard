@@ -114,8 +114,6 @@ class PuertaRetrieveAPIView(RetrieveAPIView):
 
 @authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
 @permission_classes([IsAuthenticated]) #Si la ruta está protegida
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
 class PuertaDestroyAPIView(DestroyAPIView):
     serializer_class = PuertaCreateSerializer
     queryset = Puerta.objects.all()
