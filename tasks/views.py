@@ -44,10 +44,8 @@ def signup(request):
                         "error": "No se encontró foto en el formulario"
                     })
 
-                #img_id = registro_facial(request.POST["username"], photo_data)
-
                 response = requests.post(
-                    "https://microservicio-fr-api.onrender.com/registro/",
+                    "https://microservicio-fr.onrender.com/registro/",
                     data={"usuario": request.POST["username"], "photo": photo_data},
                 )
 
@@ -62,6 +60,8 @@ def signup(request):
                     })
 
                 img_id = api_response.get("img_id")
+
+                # img_id = registro_facial(request.POST["username"], photo_data)
 
                 """
                 if img_id is None:
@@ -104,6 +104,25 @@ def signup(request):
                     {
                         "form": UserCreationForm,
                         "error": "El usuario ya existe",
+                    },  # Aqui esta el formulario y tambien creamos el error
+                )
+            except requests.exceptions.RequestException as e:
+                return render(  # Aqui retornamos a la misma vista y el mismo formulario
+                    request,
+                    "signup.html",  # Vista
+                    {
+                        "form": UserCreationForm,
+                        "error": "Error de comunicación",
+                    },  # Aqui esta el formulario y tambien creamos el error
+                )
+
+            except Exception as e:
+                return render(  # Aqui retornamos a la misma vista y el mismo formulario
+                    request,
+                    "signup.html",  # Vista
+                    {
+                        "form": UserCreationForm,
+                        "error": "Error inesperado",
                     },  # Aqui esta el formulario y tambien creamos el error
                 )
         return render(
