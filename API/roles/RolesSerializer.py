@@ -4,7 +4,7 @@ from areas.models import Roles
 class RolesListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Roles
-        fields = ['id', 'nombre', 'descripcion']
+        fields = ['id', 'nombre', 'descripcion', 'activo']
 
 class RolesCreateSerializer(serializers.ModelSerializer):
     class Meta:
