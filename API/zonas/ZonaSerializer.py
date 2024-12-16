@@ -4,7 +4,7 @@ from areas.models import Zona
 class ZonaListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Zona
-        fields = ['id', 'nombre', 'descripcion']
+        fields = ['id', 'nombre', 'descripcion', 'activo']
 
 class ZonaCreateSerializer(serializers.ModelSerializer):
     class Meta:

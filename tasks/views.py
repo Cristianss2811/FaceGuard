@@ -44,6 +44,7 @@ def signup(request):
                         "error": "No se encontró foto en el formulario"
                     })
 
+                """
                 response = requests.post(
                     "https://microservicio-fr.onrender.com/registro/",
                     data={"usuario": request.POST["username"], "photo": photo_data},
@@ -60,10 +61,10 @@ def signup(request):
                     })
 
                 img_id = api_response.get("img_id")
-
-                # img_id = registro_facial(request.POST["username"], photo_data)
-
                 """
+
+                img_id = registro_facial(request.POST["username"], photo_data)
+
                 if img_id is None:
                     print("No se detectaron rostros")
                     return render(request, "signup.html", {
@@ -77,7 +78,6 @@ def signup(request):
                         "form": UserCreationForm(),
                         "error": "Error al decodificar la imagen"
                     })
-                """
 
                 # Registrar Usuario
                 user = User.objects.create_user(
