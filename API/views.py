@@ -8,7 +8,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from tutorial.quickstart.serializers import UserSerializer
 
-from API.areas.AreaSerializer import AreaListSerializer, AreaCreateSerializer, AreaUpdateSerializer
+from API.areas.AreaSerializer import AreaListSerializer, AreaCreateSerializer
 from API.login.LoginSerializer import LoginSerializer
 from API.moviminetos.MovimientoSeralizer import MovimientoSerializer
 from API.notificaciones.NotificacionSerializer import NotificacionSerializer
@@ -30,35 +30,38 @@ UserModel = get_user_model()
 API's de la tabla Area
 '''
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
-class AreaListAPIView(ListAPIView):
-    def get_queryset(self):
-        return Area.objects.all()
 
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
+class AreaListAPIView(ListAPIView):
+    queryset = Area.objects.prefetch_related('zonas')  # Optimiza la consulta
     serializer_class = AreaListSerializer
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
 class AreaCreateAPIView(CreateAPIView):
     serializer_class = AreaCreateSerializer
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
 class AreaRetrieveAPIView(RetrieveAPIView):
     serializer_class = AreaCreateSerializer
     queryset = Area.objects.all()
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
 class AreaDestroyAPIView(DestroyAPIView):
     serializer_class = AreaCreateSerializer
     queryset = Area.objects.all()
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
 class AreaUpdateAPIView(UpdateAPIView):
-    serializer_class = AreaUpdateSerializer
+    serializer_class = AreaCreateSerializer
     queryset = Area.objects.all()
 
 
@@ -66,33 +69,38 @@ class AreaUpdateAPIView(UpdateAPIView):
 API's de la tabla Zonas
 '''
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
 class ZonaListAPIView(ListAPIView):
     def get_queryset(self):
         return Zona.objects.all()
 
     serializer_class = AreaListSerializer
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
 class ZonaCreateAPIView(CreateAPIView):
     serializer_class = ZonaListSerializer
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
 class ZonaRetrieveAPIView(RetrieveAPIView):
     serializer_class = ZonaCreateSerializer
     queryset = Zona.objects.all()
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
 class ZonaDestroyAPIView(DestroyAPIView):
     serializer_class = ZonaCreateSerializer
     queryset = Zona.objects.all()
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
 class ZonaUpdateAPIView(UpdateAPIView):
     serializer_class = ZonaUpdateSerializer
     queryset = Zona.objects.all()
@@ -102,33 +110,38 @@ class ZonaUpdateAPIView(UpdateAPIView):
 API's de la tabla Puertas
 '''
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
 class PuertaListAPIView(ListAPIView):
     def get_queryset(self):
         return Puerta.objects.all()
 
     serializer_class = PuertaListSerializer
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
 class PuertaCreateAPIView(CreateAPIView):
     serializer_class = PuertaListSerializer
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
 class PuertaRetrieveAPIView(RetrieveAPIView):
     serializer_class = PuertaCreateSerializer
     queryset = Puerta.objects.all()
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
 class PuertaDestroyAPIView(DestroyAPIView):
     serializer_class = PuertaCreateSerializer
     queryset = Puerta.objects.all()
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
 class PuertaUpdateAPIView(UpdateAPIView):
     serializer_class = PuertaUpdateSerializer
     queryset = Puerta.objects.all()
@@ -161,7 +174,7 @@ def register(request):
         serializer.save()
 
         user = UserModel.objects.get(username=serializer.data['username'])
-        #user.set_password(serializer.data['password'])
+        # user.set_password(serializer.data['password'])
         user.save()
 
         token = Token.objects.create(user=user)
@@ -172,11 +185,10 @@ def register(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 @api_view(['POST'])
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
-#Esta consulta debe enviar un HEADER de Authentication con la propiedad Token
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
+# Esta consulta debe enviar un HEADER de Authentication con la propiedad Token
 def profile(request):
     print(request.data)
 
@@ -187,36 +199,42 @@ def profile(request):
 API's de la tabla Roles
 '''
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
 class RolesListAPIView(ListAPIView):
     def get_queryset(self):
         return Roles.objects.all()
 
     serializer_class = RolesListSerializer
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
 class RolesCreateAPIView(CreateAPIView):
     serializer_class = RolesListSerializer
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
 class RolesRetrieveAPIView(RetrieveAPIView):
     serializer_class = RolesCreateSerializer
     queryset = Roles.objects.all()
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
 class RolesDestroyAPIView(DestroyAPIView):
     serializer_class = RolesCreateSerializer
     queryset = Roles.objects.all()
 
-@authentication_classes([TokenAuthentication]) #Utilizada para autenticarse
-@permission_classes([IsAuthenticated]) #Si la ruta está protegida
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])  # Si la ruta está protegida
 class RolesUpdateAPIView(UpdateAPIView):
     serializer_class = RolesUpdateSerializer
     queryset = Roles.objects.all()
+
 
 """
 API's de Notificaciones
@@ -245,11 +263,13 @@ class NotificacionMarkAsReadAPIView(APIView):
             notificacion.save()
             return Response({'status': 'Notificación marcada como leída'})
         except Notificacion.DoesNotExist:
-            return Response({'error': 'Notificación no encontrada'}, status = 404)
+            return Response({'error': 'Notificación no encontrada'}, status=404)
+
 
 """
 API´s Usuarios
 """
+
 
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -262,11 +282,13 @@ class ProfileListAPIView(ListAPIView):
             return Profile.objects.all()
         return Profile.objects.filter(user=user)
 
+
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 class ProfileUpdateAPIView(UpdateAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileListSerializer
+
 
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -285,6 +307,7 @@ class UnassignedRolesView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Profile.DoesNotExist:
             return Response({"error": "Perfil no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
 
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -311,6 +334,7 @@ class AssignRoleView(APIView):
             return Response({"error": "Perfil no encontrado"}, status=status.HTTP_404_NOT_FOUND)
         except Roles.DoesNotExist:
             return Response({"error": "Rol no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
 
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -339,9 +363,11 @@ class DeleteRoleAssignmentView(APIView):
         except Roles.DoesNotExist:
             return Response({"error": "Rol no encontrado"}, status=status.HTTP_404_NOT_FOUND)
 
+
 """
 API's de Movimientos
 """
+
 
 @authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
 @permission_classes([IsAuthenticated])
