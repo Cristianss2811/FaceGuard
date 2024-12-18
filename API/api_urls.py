@@ -5,7 +5,7 @@ from API.views import AreaListAPIView, AreaCreateAPIView, AreaRetrieveAPIView, A
     PuertaCreateAPIView, PuertaRetrieveAPIView, PuertaDestroyAPIView, PuertaUpdateAPIView, register, profile, \
     RolesListAPIView, RolesCreateAPIView, RolesRetrieveAPIView, RolesDestroyAPIView, RolesUpdateAPIView, \
     NotificacionListAPIView, NotificacionMarkAsReadAPIView, ProfileListAPIView, ProfileUpdateAPIView, AssignRoleView, \
-    UnassignedRolesView, DeleteRoleAssignmentView, MovimientoListView
+    UnassignedRolesView, DeleteRoleAssignmentView, MovimientoListView, VerificarRostroAccesoView
 from API.views import login
 
 urlpatterns = [
@@ -47,4 +47,6 @@ urlpatterns = [
     path('profiles/<int:profile_id>/unassigned-roles/', UnassignedRolesView.as_view(), name='unassigned-roles'),
     path('profiles/<int:profile_id>/assign-role/', AssignRoleView.as_view(), name='assign-role'),
     path('profiles/<int:profile_id>/roles/<int:role_id>/delete/', DeleteRoleAssignmentView.as_view(), name='delete_role_assignment'),
+
+    path('puertas/<int:puerta_id>/verificar/', VerificarRostroAccesoView.as_view(), name='verificar_rostro_acceso'),
 ]

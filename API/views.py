@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, DestroyAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -16,13 +17,15 @@ from API.puertas.PuertaSerializer import PuertaListSerializer, PuertaCreateSeria
 from API.usuarios.UsuariosSerializer import ProfileListSerializer, RoleSerializer
 from API.zonas.ZonaSerializer import ZonaListSerializer, ZonaCreateSerializer, ZonaUpdateSerializer
 from API.roles.RolesSerializer import RolesListSerializer, RolesCreateSerializer, RolesUpdateSerializer
-from areas.models import Area, Zona, Puerta, Roles
+from areas.models import Area, Zona, Puerta, Roles, PuertasRoles
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from atencion.models import Movimiento
 from notificaciones.models import Notificacion
 from usuarios.models import Profile, ProfileRole
+from usuarios.utils.registro_facial import login_captura_facial, consultar_imagen_usuario
+from usuarios.views import notificar_a_staff, registrar_movimiento
 
 UserModel = get_user_model()
 
@@ -362,6 +365,132 @@ class DeleteRoleAssignmentView(APIView):
             return Response({"error": "Perfil no encontrado"}, status=status.HTTP_404_NOT_FOUND)
         except Roles.DoesNotExist:
             return Response({"error": "Rol no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
+"""
+class VerificarRostroAccesoView(APIView):
+    #permission_classes = [IsAuthenticated]
+
+    def post(self, request, puerta_id):
+        photo_data = request.data.get("photo")
+
+        if not photo_data:
+            return Response({"detail": "No se encontró foto en la solicitud."}, status=status.HTTP_400_BAD_REQUEST)
+
+        profile = request.user.profile
+        puerta = get_object_or_404(Puerta, id=puerta_id)
+
+        if not profile or not profile.imagen_id:
+            return Response({"detail": "Perfil de usuario inválido o sin imagen registrada."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Consultar la imagen del usuario registrada
+        img_profile = profile.imagen_id
+        user_face = consultar_imagen_usuario(imagen_id=img_profile)
+
+        if user_face is False:
+            return Response({"detail": "El usuario no tiene rostro registrado."}, status=status.HTTP_400_BAD_REQUEST)
+        if user_face is None:
+            return Response({"detail": "Error al recuperar la imagen del perfil."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # Comparar el rostro registrado con el rostro capturado
+        resultado = login_captura_facial(user_face, photo_data)
+
+        if resultado is True:
+            # Verificar los roles del usuario y de la puerta
+            roles_usuario = ProfileRole.objects.filter(profile=profile).values_list('role', flat=True)
+            roles_puerta = PuertasRoles.objects.filter(puerta=puerta).values_list('rol', flat=True)
+            acceso = any(rol in roles_puerta for rol in roles_usuario)
+
+            # Registrar el movimiento
+            accion = "Acceso" if acceso else "Acceso denegado"
+            registrar_movimiento(accion, profile, puerta)
+
+            # Notificar al staff
+            mensaje = (
+                f"{accion} concedido\n"
+                f"Usuario: {profile.user}\n"
+            )
+            notificar_a_staff(mensaje)
+
+            return Response({"puerta": puerta.id, "acceso": acceso}, status=status.HTTP_200_OK)
+
+        elif resultado is False:
+            return Response({"detail": "No coinciden lo suficiente los rostros."}, status=status.HTTP_400_BAD_REQUEST)
+        elif resultado == -100:
+            return Response({"detail": "Error al decodificar la imagen."}, status=status.HTTP_400_BAD_REQUEST)
+        elif resultado == -200:
+            return Response({"detail": "No se detectaron rostros en la imagen."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"detail": "Error desconocido al procesar la imagen."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+"""
+
+class VerificarRostroAccesoView(APIView):
+    # permission_classes = [IsAuthenticated]  # Si quieres mantener la autenticación, descomenta esta línea
+
+    def post(self, request, puerta_id):
+        # Obtener la imagen y el nombre de usuario desde la solicitud
+        photo_data = request.data.get("photo")
+        username = request.data.get("username")
+
+        # Validar que se haya enviado la foto y el nombre de usuario
+        if not photo_data:
+            return Response({"detail": "No se encontró foto en la solicitud."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not username:
+            return Response({"detail": "No se proporcionó el nombre de usuario."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Buscar el perfil asociado con el nombre de usuario proporcionado
+        try:
+            user = get_object_or_404(User, username=username)
+            profile = user.profile
+        except:
+            return Response({"detail": "Usuario no encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
+        puerta = get_object_or_404(Puerta, id=puerta_id)
+
+        # Validar que el perfil tenga una imagen registrada
+        if not profile or not profile.imagen_id:
+            return Response({"detail": "Perfil de usuario inválido o sin imagen registrada."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Consultar la imagen del usuario registrada
+        img_profile = profile.imagen_id
+        user_face = consultar_imagen_usuario(imagen_id=img_profile)
+
+        if user_face is False:
+            return Response({"detail": "El usuario no tiene rostro registrado."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if user_face is None:
+            return Response({"detail": "Error al recuperar la imagen del perfil."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # Comparar el rostro registrado con el rostro capturado
+        resultado = login_captura_facial(user_face, photo_data)
+
+        if resultado is True:
+            # Verificar los roles del usuario y de la puerta
+            roles_usuario = ProfileRole.objects.filter(profile=profile).values_list('role', flat=True)
+            roles_puerta = PuertasRoles.objects.filter(puerta=puerta).values_list('rol', flat=True)
+            acceso = any(rol in roles_puerta for rol in roles_usuario)
+
+            # Registrar el movimiento
+            accion = "Acceso" if acceso else "Acceso denegado"
+            registrar_movimiento(accion, profile, puerta)
+
+            # Notificar al staff
+            mensaje = (
+                f"{accion} concedido\n"
+                f"Usuario: {profile.user}\n"
+            )
+            notificar_a_staff(mensaje)
+
+            return Response({"puerta": puerta.id, "acceso": acceso}, status=status.HTTP_200_OK)
+
+        elif resultado is False:
+            return Response({"detail": "No coinciden lo suficiente los rostros."}, status=status.HTTP_400_BAD_REQUEST)
+        elif resultado == -100:
+            return Response({"detail": "Error al decodificar la imagen."}, status=status.HTTP_400_BAD_REQUEST)
+        elif resultado == -200:
+            return Response({"detail": "No se detectaron rostros en la imagen."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"detail": "Error desconocido al procesar la imagen."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 """
