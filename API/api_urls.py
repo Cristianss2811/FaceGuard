@@ -1,6 +1,6 @@
 from django.urls import path
 
-from API.views import AreaListAPIView, AreaCreateAPIView, AreaRetrieveAPIView, AreaDestroyAPIView, AreaUpdateAPIView, \
+from API.views import AreaListAPIView, AreaCreateAPIView, AreaRetrieveAPIView, AreaDestroyAPIView, AreaUpdateAPIView, MovimientoListView, \
     ZonaListAPIView, ZonaCreateAPIView, ZonaRetrieveAPIView, ZonaDestroyAPIView, ZonaUpdateAPIView, PuertaListAPIView, \
     PuertaCreateAPIView, PuertaRetrieveAPIView, PuertaDestroyAPIView, PuertaUpdateAPIView, register, profile, \
     RolesListAPIView, RolesCreateAPIView, RolesRetrieveAPIView, RolesDestroyAPIView, RolesUpdateAPIView, \
@@ -38,4 +38,6 @@ urlpatterns = [
 
     path('notificaciones/list', NotificacionListAPIView.as_view(), name='notificaciones_list'),
     path('notificaciones/marcar-leida/<pk>', NotificacionMarkAsReadAPIView.as_view(), name='notificaciones_mark_as_read'),
+
+    path('movimientos/', MovimientoListView.as_view(), name='movimiento-list'),
 ]

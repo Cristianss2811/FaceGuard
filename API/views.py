@@ -1,3 +1,5 @@
+from API.moviminetos.MovimientoSeralizer import MovimientoSerializer
+from atencion.models import Movimiento
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, DestroyAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -242,3 +244,13 @@ class NotificacionMarkAsReadAPIView(APIView):
             return Response({'status': 'Notificación marcada como leída'})
         except Notificacion.DoesNotExist:
             return Response({'error': 'Notificación no encontrada'}, status = 404)
+
+"""
+API's de Movimientos
+"""
+
+@authentication_classes([TokenAuthentication])  # Utilizada para autenticarse
+@permission_classes([IsAuthenticated])
+class MovimientoListView(ListAPIView):
+    queryset = Movimiento.objects.all()
+    serializer_class = MovimientoSerializer
