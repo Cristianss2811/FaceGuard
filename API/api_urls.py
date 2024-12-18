@@ -1,10 +1,11 @@
 from django.urls import path
 
-from API.views import AreaListAPIView, AreaCreateAPIView, AreaRetrieveAPIView, AreaDestroyAPIView, AreaUpdateAPIView, MovimientoListView, \
+from API.views import AreaListAPIView, AreaCreateAPIView, AreaRetrieveAPIView, AreaDestroyAPIView, AreaUpdateAPIView, \
     ZonaListAPIView, ZonaCreateAPIView, ZonaRetrieveAPIView, ZonaDestroyAPIView, ZonaUpdateAPIView, PuertaListAPIView, \
     PuertaCreateAPIView, PuertaRetrieveAPIView, PuertaDestroyAPIView, PuertaUpdateAPIView, register, profile, \
     RolesListAPIView, RolesCreateAPIView, RolesRetrieveAPIView, RolesDestroyAPIView, RolesUpdateAPIView, \
-    NotificacionListAPIView, NotificacionMarkAsReadAPIView
+    NotificacionListAPIView, NotificacionMarkAsReadAPIView, ProfileListAPIView, ProfileUpdateAPIView, AssignRoleView, \
+    UnassignedRolesView, DeleteRoleAssignmentView, MovimientoListView
 from API.views import login
 
 urlpatterns = [
@@ -40,4 +41,10 @@ urlpatterns = [
     path('notificaciones/marcar-leida/<pk>', NotificacionMarkAsReadAPIView.as_view(), name='notificaciones_mark_as_read'),
 
     path('movimientos/', MovimientoListView.as_view(), name='movimiento-list'),
+
+    path('profiles/list', ProfileListAPIView.as_view(), name='profile_list'),
+    path('profiles/update/<int:pk>/', ProfileUpdateAPIView.as_view(), name='profile_update'),
+    path('profiles/<int:profile_id>/unassigned-roles/', UnassignedRolesView.as_view(), name='unassigned-roles'),
+    path('profiles/<int:profile_id>/assign-role/', AssignRoleView.as_view(), name='assign-role'),
+    path('profiles/<int:profile_id>/roles/<int:role_id>/delete/', DeleteRoleAssignmentView.as_view(), name='delete_role_assignment'),
 ]

@@ -1,5 +1,3 @@
-from API.moviminetos.MovimientoSeralizer import MovimientoSerializer
-from atencion.models import Movimiento
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, DestroyAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -12,15 +10,19 @@ from tutorial.quickstart.serializers import UserSerializer
 
 from API.areas.AreaSerializer import AreaListSerializer, AreaCreateSerializer, AreaUpdateSerializer
 from API.login.LoginSerializer import LoginSerializer
+from API.moviminetos.MovimientoSeralizer import MovimientoSerializer
 from API.notificaciones.NotificacionSerializer import NotificacionSerializer
 from API.puertas.PuertaSerializer import PuertaListSerializer, PuertaCreateSerializer, PuertaUpdateSerializer
+from API.usuarios.UsuariosSerializer import ProfileListSerializer, RoleSerializer
 from API.zonas.ZonaSerializer import ZonaListSerializer, ZonaCreateSerializer, ZonaUpdateSerializer
 from API.roles.RolesSerializer import RolesListSerializer, RolesCreateSerializer, RolesUpdateSerializer
 from areas.models import Area, Zona, Puerta, Roles
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
+from atencion.models import Movimiento
 from notificaciones.models import Notificacion
+from usuarios.models import Profile, ProfileRole
 
 UserModel = get_user_model()
 
@@ -244,6 +246,98 @@ class NotificacionMarkAsReadAPIView(APIView):
             return Response({'status': 'Notificación marcada como leída'})
         except Notificacion.DoesNotExist:
             return Response({'error': 'Notificación no encontrada'}, status = 404)
+
+"""
+API´s Usuarios
+"""
+
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+class ProfileListAPIView(ListAPIView):
+    serializer_class = ProfileListSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return Profile.objects.all()
+        return Profile.objects.filter(user=user)
+
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+class ProfileUpdateAPIView(UpdateAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileListSerializer
+
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+class UnassignedRolesView(APIView):
+    def get(self, request, profile_id):
+        try:
+            # Obtener el perfil del usuario
+            profile = Profile.objects.get(id=profile_id)
+
+            # Obtener roles que no están asignados al perfil
+            assigned_roles = ProfileRole.objects.filter(profile=profile).values_list('role', flat=True)
+            unassigned_roles = Roles.objects.exclude(id__in=assigned_roles, activo=True)
+
+            # Serializar los roles disponibles
+            serializer = RoleSerializer(unassigned_roles, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Profile.DoesNotExist:
+            return Response({"error": "Perfil no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+class AssignRoleView(APIView):
+    def post(self, request, profile_id):
+        try:
+            # Obtener el perfil y los datos del rol desde la solicitud
+            profile = Profile.objects.get(id=profile_id)
+            role_id = request.data.get('role_id')
+            fecha_vencimiento = request.data.get('fecha_vencimiento')
+
+            # Verificar si el rol ya está asignado
+            if ProfileRole.objects.filter(profile=profile, role_id=role_id).exists():
+                return Response({"error": "El rol ya está asignado a este perfil."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Asignar el rol
+            role = Roles.objects.get(id=role_id)
+            profile_role = ProfileRole(profile=profile, role=role, fecha_vencimiento=fecha_vencimiento)
+            profile_role.save()
+
+            return Response({"message": "Rol asignado correctamente"}, status=status.HTTP_201_CREATED)
+
+        except Profile.DoesNotExist:
+            return Response({"error": "Perfil no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+        except Roles.DoesNotExist:
+            return Response({"error": "Rol no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+class DeleteRoleAssignmentView(APIView):
+    def delete(self, request, profile_id, role_id):
+        try:
+            # Obtener el perfil y el rol
+            profile = Profile.objects.get(id=profile_id)
+            role = Roles.objects.get(id=role_id)
+
+            # Filtrar roles asignados a este perfil
+            profile_roles = ProfileRole.objects.filter(profile=profile)
+
+            # Verificar si el rol está asignado al perfil
+            if not profile_roles.filter(role=role).exists():
+                return Response({"error": "El rol no está asignado a este perfil."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Eliminar la asignación de rol
+            profile_role = profile_roles.get(role=role)
+            profile_role.delete()
+
+            return Response({"message": "Rol eliminado correctamente del perfil."}, status=status.HTTP_200_OK)
+
+        except Profile.DoesNotExist:
+            return Response({"error": "Perfil no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+        except Roles.DoesNotExist:
+            return Response({"error": "Rol no encontrado"}, status=status.HTTP_404_NOT_FOUND)
 
 """
 API's de Movimientos
