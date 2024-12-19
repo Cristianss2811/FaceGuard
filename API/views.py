@@ -519,12 +519,12 @@ class VerificarRostroAccesoView(APIView):
             acceso = any(rol in roles_puerta for rol in roles_usuario)
 
             # Registrar el movimiento
-            accion = "Acceso" if acceso else "Acceso denegado"
+            accion = "Acceso concedido" if acceso else "Acceso denegado"
             registrar_movimiento(accion, profile, puerta)
 
             # Notificar al staff
             mensaje = (
-                f"{accion} concedido\n"
+                f"{accion}\n"
                 f"Usuario: {profile.user}\n"
             )
             notificar_a_staff(mensaje)
