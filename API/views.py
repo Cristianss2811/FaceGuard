@@ -165,6 +165,7 @@ def login(request):
 class SignupAPI(APIView):
     def post(self, request, *args, **kwargs):
         try:
+            #print(request)
             # Validar que se envíen los datos necesarios
             username = request.data.get("username")
             password1 = request.data.get("password")
