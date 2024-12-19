@@ -5,7 +5,7 @@ from API.views import AreaListAPIView, AreaCreateAPIView, AreaRetrieveAPIView, A
     PuertaCreateAPIView, PuertaRetrieveAPIView, PuertaDestroyAPIView, PuertaUpdateAPIView, register, profile, \
     RolesListAPIView, RolesCreateAPIView, RolesRetrieveAPIView, RolesDestroyAPIView, RolesUpdateAPIView, \
     NotificacionListAPIView, NotificacionMarkAsReadAPIView, ProfileListAPIView, ProfileUpdateAPIView, AssignRoleView, \
-    UnassignedRolesView, DeleteRoleAssignmentView, MovimientoListView, VerificarRostroAccesoView
+    UnassignedRolesView, DeleteRoleAssignmentView, MovimientoListView, VerificarRostroAccesoView, SignupAPI
 from API.views import login
 
 urlpatterns = [
@@ -27,9 +27,9 @@ urlpatterns = [
     path('puertas/delete/<pk>', PuertaDestroyAPIView.as_view(), name='puertas-delete'),
     path('puertas/update/<pk>', PuertaUpdateAPIView.as_view(), name='puertas-update'),
 
-    path('login', login),
-    path('register', register),
-    path('profile', profile),
+    path('login', login, name='login'),
+    path('register', SignupAPI.as_view(), name='register'),
+    path('profile', profile, name='profile'),
 
     path('roles/list', RolesListAPIView.as_view(), name='roles_list'),
     path('roles/create', RolesCreateAPIView.as_view(), name='roles_create'),
@@ -38,7 +38,8 @@ urlpatterns = [
     path('roles/update/<pk>', RolesUpdateAPIView.as_view(), name='roles-update'),
 
     path('notificaciones/list', NotificacionListAPIView.as_view(), name='notificaciones_list'),
-    path('notificaciones/marcar-leida/<pk>', NotificacionMarkAsReadAPIView.as_view(), name='notificaciones_mark_as_read'),
+    path('notificaciones/marcar-leida/<pk>', NotificacionMarkAsReadAPIView.as_view(),
+         name='notificaciones_mark_as_read'),
 
     path('movimientos/', MovimientoListView.as_view(), name='movimiento-list'),
 
@@ -46,7 +47,8 @@ urlpatterns = [
     path('profiles/update/<int:pk>/', ProfileUpdateAPIView.as_view(), name='profile_update'),
     path('profiles/<int:profile_id>/unassigned-roles/', UnassignedRolesView.as_view(), name='unassigned-roles'),
     path('profiles/<int:profile_id>/assign-role/', AssignRoleView.as_view(), name='assign-role'),
-    path('profiles/<int:profile_id>/roles/<int:role_id>/delete/', DeleteRoleAssignmentView.as_view(), name='delete_role_assignment'),
+    path('profiles/<int:profile_id>/roles/<int:role_id>/delete/', DeleteRoleAssignmentView.as_view(),
+         name='delete_role_assignment'),
 
     path('puertas/<int:puerta_id>/verificar/', VerificarRostroAccesoView.as_view(), name='verificar_rostro_acceso'),
 ]

@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, DestroyAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -24,7 +25,7 @@ from django.shortcuts import get_object_or_404
 from atencion.models import Movimiento
 from notificaciones.models import Notificacion
 from usuarios.models import Profile, ProfileRole
-from usuarios.utils.registro_facial import login_captura_facial, consultar_imagen_usuario
+from usuarios.utils.registro_facial import login_captura_facial, consultar_imagen_usuario, registro_facial
 from usuarios.views import notificar_a_staff, registrar_movimiento
 
 UserModel = get_user_model()
@@ -159,6 +160,54 @@ def login(request):
     serializer = LoginSerializer(instance=user)
 
     return Response({"token": token.key, "username": serializer.data['username']}, status=status.HTTP_200_OK)
+
+
+class SignupAPI(APIView):
+    def post(self, request, *args, **kwargs):
+        try:
+            # Validar que se envíen los datos necesarios
+            username = request.data.get("username")
+            password1 = request.data.get("password")
+            photo_data = request.data.get("photo")
+
+            if not username:
+                return Response({"error": "Coloca el campo username"}, status=status.HTTP_400_BAD_REQUEST)
+
+            if not password1:
+                return Response({"error": "Coloca el campo password"}, status=status.HTTP_400_BAD_REQUEST)
+
+            if not photo_data:
+                return Response({"error": "No se encontró foto en el formulario"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Procesar la foto con el sistema de reconocimiento facial
+            img_id = registro_facial(username, photo_data)
+
+            if img_id is None:
+                return Response({"error": "No se detectaron rostros"}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+            if img_id is False:
+                return Response({"error": "Error al decodificar la imagen"},
+                                status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+            # Registrar usuario
+            try:
+                user = User.objects.create_user(username=username, password=password1)
+                user.save()
+
+                # Crear el perfil asociado al usuario
+                profile = Profile.objects.create(user=user, imagen_id=img_id)
+                profile.save()
+
+                token = Token.objects.create(user=user)
+                return Response(
+                    {'token': token.key, "username": user.username},
+                    status=status.HTTP_201_CREATED)
+
+            except IntegrityError:
+                return Response({"error": "El usuario ya existe"}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response({"error": f"Error inesperado: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])
@@ -360,6 +409,7 @@ class DeleteRoleAssignmentView(APIView):
         except Roles.DoesNotExist:
             return Response({"error": "Rol no encontrado"}, status=status.HTTP_404_NOT_FOUND)
 
+
 """
 class VerificarRostroAccesoView(APIView):
     #permission_classes = [IsAuthenticated]
@@ -417,6 +467,7 @@ class VerificarRostroAccesoView(APIView):
             return Response({"detail": "Error desconocido al procesar la imagen."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 """
 
+
 class VerificarRostroAccesoView(APIView):
     # permission_classes = [IsAuthenticated]  # Si quieres mantener la autenticación, descomenta esta línea
 
@@ -443,7 +494,8 @@ class VerificarRostroAccesoView(APIView):
 
         # Validar que el perfil tenga una imagen registrada
         if not profile or not profile.imagen_id:
-            return Response({"detail": "Perfil de usuario inválido o sin imagen registrada."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Perfil de usuario inválido o sin imagen registrada."},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         # Consultar la imagen del usuario registrada
         img_profile = profile.imagen_id
@@ -453,7 +505,8 @@ class VerificarRostroAccesoView(APIView):
             return Response({"detail": "El usuario no tiene rostro registrado."}, status=status.HTTP_400_BAD_REQUEST)
 
         if user_face is None:
-            return Response({"detail": "Error al recuperar la imagen del perfil."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"detail": "Error al recuperar la imagen del perfil."},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # Comparar el rostro registrado con el rostro capturado
         resultado = login_captura_facial(user_face, photo_data)
@@ -484,7 +537,8 @@ class VerificarRostroAccesoView(APIView):
         elif resultado == -200:
             return Response({"detail": "No se detectaron rostros en la imagen."}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({"detail": "Error desconocido al procesar la imagen."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"detail": "Error desconocido al procesar la imagen."},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 """
@@ -497,3 +551,8 @@ API's de Movimientos
 class MovimientoListView(ListAPIView):
     queryset = Movimiento.objects.all()
     serializer_class = MovimientoSerializer
+
+
+"""
+API's de Reconocimiento
+"""
